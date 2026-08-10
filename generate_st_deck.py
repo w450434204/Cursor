@@ -189,9 +189,9 @@ add_text(slide, "汇报人：【待填】    部门：【待填】    日期：�
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_bg(slide)
 title(slide, 2, "专项摘要：这次要解决什么问题")
+rect(slide, 0.62, 1.18, 1.22, 0.42, BLUE, BLUE)
 add_text(slide, "一句话目标", 0.65, 1.22, 1.15, 0.32, 11, WHITE, True,
          PP_ALIGN.CENTER)
-rect(slide, 0.62, 1.18, 1.22, 0.42, BLUE, BLUE)
 rect(slide, 1.95, 1.18, 10.75, 0.92, PALE_BLUE, "B9D4FF")
 add_text(slide,
          "将支付接入从依赖人工经验和一对一支撑，升级为标准化、工具化、智能化、可度量的开发者交付体系。",
@@ -369,9 +369,9 @@ columns = [
 for i, (h, items, c) in enumerate(columns):
     x = 0.65 + i * 4.12
     card(slide, x, 1.32, 3.78, 3.85, h, items, c, WHITE, 13)
+    rect(slide, x + 0.82, 5.29, 2.12, 0.58, c, c)
     add_text(slide, ["开发完成", "允许上线", "持续稳定"][i],
              x + 0.95, 5.35, 1.85, 0.45, 15, WHITE, True, PP_ALIGN.CENTER)
-    rect(slide, x + 0.82, 5.29, 2.12, 0.58, c, c)
     if i < 2:
         line(slide, x + 3.20, 5.58, x + 4.0, 5.58, MID, 2, True)
 rect(slide, 0.65, 6.18, 12.0, 0.50, PALE_RED, "FFC7C7")
