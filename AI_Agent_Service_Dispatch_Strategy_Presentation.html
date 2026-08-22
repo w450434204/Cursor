@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>战略汇报：构建鸿蒙 AI Agent 服务调度中台——打造“服务界的应用商店”</title>
+    <style>
+        :root {
+            --primary: #0A59F7;
+            --primary-dark: #0036B3;
+            --primary-light: #EBF2FF;
+            --secondary: #6B7280;
+            --accent: #FF5A1F;
+            --dark: #111827;
+            --light: #F9FAFB;
+            --white: #FFFFFF;
+            --border: #E5E7EB;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --card-hover-shadow: 0 20px 30px -10px rgba(10, 89, 247, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background-color: #0F172A;
+            color: var(--dark);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            max-width: 1600px;
+            max-height: 900px;
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        /* Slide header */
+        .slide-header {
+            padding: 24px 48px 12px 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .slide-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide-category {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .slide-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--dark);
+            letter-spacing: -0.5px;
+        }
+
+        .slide-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Slide content body */
+        .slide-body {
+            flex: 1;
+            padding: 32px 48px;
+            overflow-y: auto;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .slide-body.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Slide footer */
+        .slide-footer {
+            padding: 16px 48px;
+            background: var(--light);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-left {
+            font-size: 13px;
+            color: var(--secondary);
+            font-weight: 500;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .page-counter {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .btn {
+            background: var(--white);
+            border: 1px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(10, 89, 247, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Common layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 24px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--card-hover-shadow);
+            border-color: rgba(10, 89, 247, 0.3);
+        }
+
+        .card.featured {
+            border: 2px solid var(--primary);
+            background: linear-gradient(180deg, #FAFCFF 0%, #FFFFFF 100%);
+        }
+
+        .card.dark {
+            background: #1E293B;
+            color: var(--white);
+            border: none;
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .card.dark .card-title {
+            color: var(--white);
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: var(--secondary);
+            line-height: 1.6;
+        }
+
+        .card.dark .card-desc {
+            color: #94A3B8;
+        }
+
+        .highlight-text {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: #E2E8F0;
+            color: #475569;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+
+        .tag-accent {
+            background: #FFEDD5;
+            color: #C2410C;
+        }
+
+        .tag-primary {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* Cover Slide */
+        .cover-slide {
+            text-align: center;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .cover-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cover-title {
+            font-size: 46px;
+            font-weight: 900;
+            line-height: 1.2;
+            color: var(--dark);
+            margin-bottom: 16px;
+            max-width: 1000px;
+        }
+
+        .cover-subtitle {
+            font-size: 22px;
+            color: var(--secondary);
+            margin-bottom: 40px;
+            font-weight: 500;
+            max-width: 800px;
+        }
+
+        .cover-meta {
+            display: flex;
+            gap: 32px;
+            background: var(--light);
+            padding: 16px 36px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .meta-label {
+            font-size: 11px;
+            color: var(--secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .meta-value {
+            font-size: 14px;
+            color: var(--dark);
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        /* Flow diagram */
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .flow-step {
+            flex: 1;
+            background: var(--white);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            position: relative;
+            box-shadow: var(--card-shadow);
+        }
+
+        .flow-arrow {
+            font-size: 20px;
+            color: var(--primary);
+            padding: 0 12px;
+            font-weight: 900;
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .comparison-table th {
+            background: #F1F5F9;
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--dark);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-table td {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            color: var(--dark);
+            background: var(--white);
+        }
+
+        .comparison-table tr:hover td {
+            background: #F8FAFC;
+        }
+
+        .stat-banner {
+            background: linear-gradient(135deg, var(--primary) 0%, #1E40AF 100%);
+            color: var(--white);
+            padding: 20px 30px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            margin-bottom: 24px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+
+        .stat-lbl {
+            font-size: 12px;
+            opacity: 0.85;
+            font-weight: 500;
+        }
+
+        /* Keyboard hint */
+        .key-hint {
+            display: inline-block;
+            background: #E2E8F0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: monospace;
+            border: 1px solid #CBD5E1;
+            margin: 0 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="presentation-container">
+    <!-- Slide Header -->
+    <div class="slide-header">
+        <div class="slide-title-group">
+            <span class="slide-category" id="slideCategory">战略机遇与顶层设计</span>
+            <h1 class="slide-title" id="slideTitle">构建鸿蒙 AI Agent 服务调度中台</h1>
+        </div>
+        <div class="slide-badge" id="slideBadge">三部门联合战略提案</div>
+    </div>
+
+    <!-- Slide 1: Cover -->
+    <div class="slide-body active" data-category="战略机遇与顶层设计" data-title="构建鸿蒙 AI Agent 服务调度中台" data-badge="战略规划 V1.0">
+        <div class="cover-slide">
+            <div class="cover-badge">
+                <span>✦</span> 2026 鸿蒙生态服务分发终局形态
+            </div>
+            <h1 class="cover-title">打造“服务界的应用商店”<br><span style="color: var(--primary);">开启 AI Agent 时代千亿级商业闭环</span></h1>
+            <p class="cover-subtitle">打破负一屏传统卡片流，构建“意图注册 · 智能路由 · 凭证注入 · Agent-Pay 结算”超级中枢</p>
+            
+            <div class="cover-meta">
+                <div class="meta-item">
+                    <span class="meta-label">联合汇报部门</span>
+                    <span class="meta-value">服务分发业务部 × 钱包业务部 × 花瓣支付业务部</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">战略核心</span>
+                    <span class="meta-value">从 CPM 广告售卖 跃迁至 CPS 交易分润</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">汇报日期</span>
+                    <span class="meta-value">2026年8月</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: Agenda -->
+    <div class="slide-body" data-category="目录大纲" data-title="战略汇报核心议题" data-badge="Agenda">
+        <div class="grid-3" style="margin-top: 10px;">
+            <div class="card">
+                <div class="card-icon">01</div>
+                <h3 class="card-title">战略背景与行业变局</h3>
+                <p class="card-desc">交互范式从 GUI 跃迁至 LUI，外部巨头跨端渗透，入口保卫战全面打响。</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">02</div>
+                <h3 class="card-title">核心定位与体系设计</h3>
+                <p class="card-desc">定义“服务界的应用商店”，构建意图路由、跨端流转与 Agent-Pay 支付闭环。</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">03</div>
+                <h3 class="card-title">三大部门协同底座</h3>
+                <p class="card-desc">分发 + 钱包 + 支付深度融合，打造第三方无法复制的系统级核心壁垒。</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">04</div>
+                <h3 class="card-title">商业模式与收益飞轮</h3>
+                <p class="card-desc">从卖流量点击（CPC）跃迁至任务交易分成（CPS），单客价值提升 20 倍。</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">05</div>
+                <h3 class="card-title">组织颠覆与落地战役</h3>
+                <p class="card-desc">设立敏捷 SWAT 特战纵队，聚焦“出行、咖啡、商旅”首期三大核心场景破局。</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">06</div>
+                <h3 class="card-title">资源诉求与 ROI 预期</h3>
+                <p class="card-desc">明确跨部门授权、研发接口开放与生态激励，展望千亿级交易中枢蓝图。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Background & Threat -->
+    <div class="slide-body" data-category="战略背景与威胁" data-title="行业范式剧变：AI Agent 入口争夺战已打响" data-badge="行业洞察">
+        <div class="stat-banner">
+            <div class="stat-item">
+                <div class="stat-val">30 亿次+</div>
+                <div class="stat-lbl">小艺日均唤醒总量</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-val">&lt; 1%</div>
+                <div class="stat-lbl">当前高价值服务调用转化率（巨大金矿未开垦）</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-val">LUI + Headless</div>
+                <div class="stat-lbl">下一代终端核心交互形态（语言即界面）</div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card" style="border-left: 4px solid var(--accent);">
+                <h3 class="card-title" style="color: var(--accent);">外部严峻威胁：跨端巨头加速架空手机入口</h3>
+                <ul style="font-size: 14px; line-height: 1.8; color: var(--secondary); margin-left: 18px;">
+                    <li><strong>支付宝“阿宝”</strong>：正全力抢占“手机右滑唤起 AI 办万事”心智，一次接入多手机品牌+车机+AI眼镜。</li>
+                    <li><strong>微信智能体</strong>：依托全网最强小程序生态，正加速渗透硬件最后一公里。</li>
+                    <li><strong>战略风险</strong>：若第三方接管意图调度，华为分发沦为管道，钱包沦为卡夹，支付失去高频交易场景。</li>
+                </ul>
+            </div>
+            <div class="card featured">
+                <h3 class="card-title" style="color: var(--primary);">华为历史机遇：系统级意图底座的降维打击</h3>
+                <ul style="font-size: 14px; line-height: 1.8; color: var(--dark); margin-left: 18px;">
+                    <li><strong>独家系统特权</strong>：锁屏状态感知、全天候传感器、实况窗动态常驻。</li>
+                    <li><strong>多端无缝流转</strong>：手机 + 车机 + 手表 + 平板分布式超级设备联动。</li>
+                    <li><strong>极速闭环体验</strong>：免下载、免登录、免跳 App、花瓣支付秒级安全扣费。</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Core Positioning -->
+    <div class="slide-body" data-category="核心架构定位" data-title="核心定位：打造“服务界的应用商店”" data-badge="中台设计">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <p style="font-size: 15px; color: var(--secondary);">
+                开发者不再只是开发 GUI 界面，而是声明 <span class="highlight-text">"我能完成什么意图"</span>；系统 Agent 负责毫秒级路由、比价与履约
+            </p>
+        </div>
+
+        <div class="flow-container">
+            <div class="flow-step" style="background: #F8FAFC;">
+                <span class="tag tag-primary">输入层</span>
+                <h4 style="font-size: 16px; margin: 8px 0;">用户自然意图</h4>
+                <p style="font-size: 12px; color: var(--secondary);">“帮我订下午到上海的高铁一等座”<br>“帮我点杯冰美式”</p>
+            </div>
+            <div class="flow-arrow">➔</div>
+            <div class="flow-step featured">
+                <span class="tag tag-accent">中枢调度层</span>
+                <h4 style="font-size: 16px; margin: 8px 0; color: var(--primary);">鸿蒙 Agent 商业中台</h4>
+                <p style="font-size: 12px; color: var(--secondary);">意图解析 · 智能比价 · 凭证注入 · 任务状态追踪</p>
+            </div>
+            <div class="flow-arrow">➔</div>
+            <div class="flow-step" style="background: #F8FAFC;">
+                <span class="tag tag-primary">交易结算层</span>
+                <h4 style="font-size: 16px; margin: 8px 0;">Agent-Pay 闭环</h4>
+                <p style="font-size: 12px; color: var(--secondary);">免密受托支付 · 多方分账 · 电子发票归集</p>
+            </div>
+            <div class="flow-arrow">➔</div>
+            <div class="flow-step" style="background: #F8FAFC;">
+                <span class="tag tag-primary">呈现层</span>
+                <h4 style="font-size: 16px; margin: 8px 0;">多端实况窗</h4>
+                <p style="font-size: 12px; color: var(--secondary);">锁屏/手表/车机实时同步动态</p>
+            </div>
+        </div>
+
+        <div class="grid-3" style="margin-top: 20px;">
+            <div class="card" style="padding: 16px;">
+                <h4 style="font-size: 14px; color: var(--primary); margin-bottom: 6px;">1. 意图注册标准 (Schema)</h4>
+                <p style="font-size: 12px; color: var(--secondary);">统一的服务能力定义标准，开发者 1 天即可接入注册。</p>
+            </div>
+            <div class="card" style="padding: 16px;">
+                <h4 style="font-size: 14px; color: var(--primary); margin-bottom: 6px;">2. 智能竞价路由引擎</h4>
+                <p style="font-size: 12px; color: var(--secondary);">结合履约时效、商户价格、用户会员权益与 CPS 分成综合仲裁。</p>
+            </div>
+            <div class="card" style="padding: 16px;">
+                <h4 style="font-size: 14px; color: var(--primary); margin-bottom: 6px;">3. 任务级资金中枢</h4>
+                <p style="font-size: 12px; color: var(--secondary);">花瓣支付提供合规受托支付与实时结算分账能力。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Synergy of Three Departments -->
+    <div class="slide-body" data-category="协同壁垒" data-title="三部门协同：构建第三方无法复制的系统级闭环" data-badge="核心竞争力">
+        <div class="grid-3">
+            <div class="card">
+                <div class="card-icon" style="background: #EFF6FF; color: #2563EB;">分发</div>
+                <h3 class="card-title">服务分发业务部</h3>
+                <span class="tag tag-primary">意图调度中枢</span>
+                <ul style="font-size: 13px; color: var(--secondary); line-height: 1.7; margin-top: 10px; margin-left: 16px;">
+                    <li><strong>意图框架与中台</strong>：承接小艺与负一屏意图，毫秒级分发调度。</li>
+                    <li><strong>多场景触达</strong>：锁屏、实况窗、全场景多设备流转引擎。</li>
+                    <li><strong>流量与分润经营</strong>：从 ECPM 变现进化为 CPS 交易分润机制。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-icon" style="background: #ECFDF5; color: #059669;">钱包</div>
+                <h3 class="card-title">钱包业务部</h3>
+                <span class="tag" style="background: #D1FAE5; color: #065F46;">身份与凭证库</span>
+                <ul style="font-size: 13px; color: var(--secondary); line-height: 1.7; margin-top: 10px; margin-left: 16px;">
+                    <li><strong>硬件级凭证管理</strong>：NFC数字房卡、门禁卡、车钥匙、电子登机牌。</li>
+                    <li><strong>身份与权益注入</strong>：免输入姓名、身份证、常旅客会员卡号。</li>
+                    <li><strong>高净值用户画像</strong>：协同数据科学联合建模，精准预测需求。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-icon" style="background: #FFF7ED; color: #EA580C;">支付</div>
+                <h3 class="card-title">花瓣支付业务部</h3>
+                <span class="tag tag-accent">交易与合规底座</span>
+                <ul style="font-size: 13px; color: var(--secondary); line-height: 1.7; margin-top: 10px; margin-left: 16px;">
+                    <li><strong>Agent-Pay 创新</strong>：智能受托代扣、小额免密与大额生物认证。</li>
+                    <li><strong>合规清结算与分账</strong>：解决平台型多方结算与二清合规痛点。</li>
+                    <li><strong>智能资金风控</strong>：全链路交易反欺诈，保障 AI 代理交易安全。</li>
+                </ul>
+            </div>
+        </div>
+        <div style="margin-top: 20px; background: #F8FAFC; padding: 14px 20px; border-radius: 10px; border: 1px dashed var(--border); font-size: 13px; color: #334155; text-align: center;">
+            💡 <strong>缺一不可的铁三角</strong>：没有分发则无意图入口，没有钱包则无上下文凭证，没有支付则无法完成商业结算！
+        </div>
+    </div>
+
+    <!-- Slide 6: Business Model -->
+    <div class="slide-body" data-category="商业模型" data-title="商业模式跃迁：从广告流量售卖到交易规模分润" data-badge="商业价值">
+        <table class="comparison-table" style="margin-bottom: 20px;">
+            <thead>
+                <tr>
+                    <th>商业维度</th>
+                    <th>传统服务分发 (现状)</th>
+                    <th>AI Agent 调度中台 (未来)</th>
+                    <th>跃迁成效</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>计费模式</strong></td>
+                    <td>展示 (CPM)、点击 (CPC)</td>
+                    <td><strong>任务完成 (CPA)、订单分润 (CPS)、支付费率</strong></td>
+                    <td><span class="highlight-text">打开万亿 GMV 空间</span></td>
+                </tr>
+                <tr>
+                    <td><strong>用户转化率</strong></td>
+                    <td>1% ~ 3%（漏斗长、多次跳转）</td>
+                    <td><strong>15% ~ 30%（意图直达、免密闭环）</strong></td>
+                    <td><span class="highlight-text">提升 5 ~ 10 倍</span></td>
+                </tr>
+                <tr>
+                    <td><strong>单次商业收益</strong></td>
+                    <td>单次点击 0.2 ~ 1.5 元</td>
+                    <td><strong>单笔分成 3 ~ 50 元 + 支付手续费</strong></td>
+                    <td><span class="highlight-text">提升 20 ~ 30 倍</span></td>
+                </tr>
+                <tr>
+                    <td><strong>开发者意愿</strong></td>
+                    <td>买量成本高，开发 UI 意愿低</td>
+                    <td><strong>只需标准 API，零买量获客，极度欢迎</strong></td>
+                    <td><span class="highlight-text">生态快速自繁荣</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="grid-2">
+            <div class="card" style="padding: 18px; background: #FAF5FF; border-color: #E9D5FF;">
+                <h4 style="font-size: 15px; color: #6B21A8; margin-bottom: 6px;">💰 核心收入流 1：任务交易佣金 (CPS)</h4>
+                <p style="font-size: 13px; color: #581C87;">从外卖、打车、机票、酒店、电影票等每笔成功完成的任务中抽取 3%~10% 的技术服务佣金。</p>
+            </div>
+            <div class="card" style="padding: 18px; background: #ECFEFF; border-color: #A5F3FC;">
+                <h4 style="font-size: 15px; color: #0E7490; margin-bottom: 6px;">💳 核心收入流 2：花瓣支付交易手续费</h4>
+                <p style="font-size: 13px; color: #155E75;">所有 Agent 调度交易均沉淀为花瓣支付的活跃交易流水，获取稳定的金融清结算收益。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Scenarios & Execution -->
+    <div class="slide-body" data-category="场景落地" data-title="首期破局场景：高频刚需单点爆破" data-badge="战术打法">
+        <div class="grid-3">
+            <div class="card featured">
+                <span class="tag tag-accent">场景 1 · 极速破局</span>
+                <h3 class="card-title" style="margin-top: 8px;">即时出行打车</h3>
+                <p class="card-desc" style="font-size: 13px; margin-bottom: 12px;"><strong>指令</strong>：“小艺，帮我打一辆最快能到的车去机场”</p>
+                <div style="background: #F1F5F9; padding: 10px; border-radius: 8px; font-size: 12px; line-height: 1.6;">
+                    • 并发比对高德/滴滴/曹操运力<br>
+                    • 自动锁定最优车型并代扣<br>
+                    • 实况窗全天候展示接驾动态
+                </div>
+            </div>
+            <div class="card">
+                <span class="tag tag-primary">场景 2 · 高频起量</span>
+                <h3 class="card-title" style="margin-top: 8px;">咖啡茶饮秒点</h3>
+                <p class="card-desc" style="font-size: 13px; margin-bottom: 12px;"><strong>指令</strong>：“帮我点一杯常喝的热拿铁”</p>
+                <div style="background: #F1F5F9; padding: 10px; border-radius: 8px; font-size: 12px; line-height: 1.6;">
+                    • 自动调取历史偏好与优惠券<br>
+                    • 花瓣支付小额免密代扣下单<br>
+                    • 取餐码自动推送到手表实况窗
+                </div>
+            </div>
+            <div class="card">
+                <span class="tag tag-primary">场景 3 · 高客单标杆</span>
+                <h3 class="card-title" style="margin-top: 8px;">高铁与商旅出行</h3>
+                <p class="card-desc" style="font-size: 13px; margin-bottom: 12px;"><strong>指令</strong>：“帮我订明天去北京最早的高铁”</p>
+                <div style="background: #F1F5F9; padding: 10px; border-radius: 8px; font-size: 12px; line-height: 1.6;">
+                    • 自动调取钱包身份证与常旅客号<br>
+                    • 一键购票并生成电子行程单<br>
+                    • 航变/进出站自动触发接驳专车
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Organization & Roadmap -->
+    <div class="slide-body" data-category="组织与路线图" data-title="组织保障与实施路线图：三步走落地策略" data-badge="推进规划">
+        <div class="card dark" style="margin-bottom: 20px; padding: 16px 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h4 style="font-size: 16px; color: #38BDF8;">成立跨部门虚拟作战组织：鸿蒙 Agent 商业中台特战室 (SWAT Unit)</h4>
+                    <p style="font-size: 13px; color: #94A3B8; margin-top: 4px;">由分发、钱包、支付三方骨干联合组建，统一背负“Agent 履约订单数 + GMV + 分润收入”KPI。</p>
+                </div>
+                <span class="tag" style="background: #0284C7; color: #FFFFFF; font-size: 12px; padding: 6px 14px;">打破部门墙</span>
+            </div>
+        </div>
+
+        <div class="grid-3">
+            <div class="card" style="border-top: 4px solid var(--primary);">
+                <span class="tag tag-primary">Phase 1 (1 ~ 3 个月)</span>
+                <h4 class="card-title" style="font-size: 16px; margin-top: 6px;">链路打通与标杆树立</h4>
+                <ul style="font-size: 12px; color: var(--secondary); line-height: 1.6; margin-left: 14px;">
+                    <li>联合 2~3 家头部伙伴（出行/咖啡）</li>
+                    <li>跑通“意图-钱包-AgentPay”闭环</li>
+                    <li>验证 CPS 商业转化与佣金分成模型</li>
+                </ul>
+            </div>
+            <div class="card" style="border-top: 4px solid #10B981;">
+                <span class="tag" style="background: #D1FAE5; color: #065F46;">Phase 2 (4 ~ 6 个月)</span>
+                <h4 class="card-title" style="font-size: 16px; margin-top: 6px;">标准化与生态扩容</h4>
+                <ul style="font-size: 12px; color: var(--secondary); line-height: 1.6; margin-left: 14px;">
+                    <li>发布 Agent Service 开发者开放标准</li>
+                    <li>接入 Top 100 头部高频商户</li>
+                    <li>启动“鸿蒙智慧生活季”心智推广</li>
+                </ul>
+            </div>
+            <div class="card" style="border-top: 4px solid #8B5CF6;">
+                <span class="tag" style="background: #EDE9FE; color: #6D28D9;">Phase 3 (7 ~ 12 个月)</span>
+                <h4 class="card-title" style="font-size: 16px; margin-top: 6px;">全场景主动服务中枢</h4>
+                <ul style="font-size: 12px; color: var(--secondary); line-height: 1.6; margin-left: 14px;">
+                    <li>大模型主动预测用户生活服务意图</li>
+                    <li>覆盖手机/车机/手表/PC 全设备</li>
+                    <li>迈向千亿级 AI 商业交易调度底座</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: Resource Requests & ROI -->
+    <div class="slide-body" data-category="资源诉求与成效" data-title="资源诉求与预期成效：打造千亿级新增长极" data-badge="ROI 预测">
+        <div class="grid-2">
+            <div class="card featured">
+                <h3 class="card-title" style="color: var(--primary);">需要领导支持的三大关键资源</h3>
+                <ul style="font-size: 14px; line-height: 1.8; color: var(--dark); margin-left: 18px; margin-top: 8px;">
+                    <li><strong>组织授权</strong>：批准设立“鸿蒙 Agent 商业中台”跨部门联合工作组，打通产品、研发与商务考核。</li>
+                    <li><strong>接口与特权打通</strong>：开放小艺意图框架底层调度权限、钱包凭证接口与花瓣支付专属 Agent-Pay 代扣通道。</li>
+                    <li><strong>冷启动政策扶持</strong>：设立首期“先锋生态扶持基金”，以首年免佣/低费率及专属流量激励吸引头部开发者。</li>
+                </ul>
+            </div>
+            <div class="card" style="background: #F8FAFC;">
+                <h3 class="card-title" style="color: var(--dark);">战略预期收益与回报</h3>
+                <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 12px;">
+                    <div style="background: #FFFFFF; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                        <strong style="color: var(--primary);">服务分发业务部</strong>：从百亿流量广告池，跃升为万亿 GMV 交易分润中枢。
+                    </div>
+                    <div style="background: #FFFFFF; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                        <strong style="color: #059669;">钱包业务部</strong>：激活沉淀凭证，升级为 AI 时代的数字身份中枢。
+                    </div>
+                    <div style="background: #FFFFFF; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                        <strong style="color: #EA580C;">花瓣支付业务部</strong>：独占 AI 支付基础设施，获取百亿级高质量增量流水。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 10: Conclusion -->
+    <div class="slide-body" data-category="总结展望" data-title="总结：抓住 AI Agent 时代的“App Store”历史机遇" data-badge="行动倡议">
+        <div class="cover-slide" style="padding: 20px;">
+            <div style="max-width: 900px; background: #F8FAFC; border: 2px dashed var(--primary); padding: 36px; border-radius: 16px; margin-bottom: 24px;">
+                <blockquote style="font-size: 22px; font-weight: 700; color: var(--dark); line-height: 1.6;">
+                    “在 GUI 时代，苹果凭借 App Store 奠定了移动互联网霸权；<br>
+                    在 AI Agent 时代，谁掌握了系统级意图调度与交易中枢，<br>
+                    <span style="color: var(--primary);">谁就掌握了未来十年的生态主导权与商业印钞机！”</span>
+                </blockquote>
+            </div>
+
+            <p style="font-size: 18px; color: var(--secondary); margin-bottom: 30px;">
+                三部门合力，我们有底气、有能力、更有责任打赢这场入口保卫战！
+            </p>
+
+            <button class="btn btn-primary" style="font-size: 16px; padding: 12px 32px; border-radius: 30px;" onclick="goToSlide(0)">
+                ↻ 重新浏览提案
+            </button>
+        </div>
+    </div>
+
+    <!-- Slide Footer / Navigation Controls -->
+    <div class="slide-footer">
+        <div class="footer-left">
+            <span>💡 提示: 支持使用键盘 <span class="key-hint">←</span> <span class="key-hint">→</span> 或 <span class="key-hint">Space</span> 翻页</span>
+        </div>
+        <div class="controls">
+            <button class="btn" id="prevBtn" onclick="prevSlide()">❮ 上一页</button>
+            <div class="page-counter" id="pageCounter">1 / 10</div>
+            <button class="btn btn-primary" id="nextBtn" onclick="nextSlide()">下一页 ❯</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const slides = document.querySelectorAll('.slide-body');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const pageCounter = document.getElementById('pageCounter');
+    const slideCategory = document.getElementById('slideCategory');
+    const slideTitle = document.getElementById('slideTitle');
+    const slideBadge = document.getElementById('slideBadge');
+
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+
+    function updateSlide() {
+        slides.forEach((slide, idx) => {
+            slide.classList.toggle('active', idx === currentSlide);
+        });
+
+        const activeSlide = slides[currentSlide];
+        slideCategory.textContent = activeSlide.getAttribute('data-category') || '战略汇报';
+        slideTitle.textContent = activeSlide.getAttribute('data-title') || '构建鸿蒙 AI Agent 服务调度中台';
+        slideBadge.textContent = activeSlide.getAttribute('data-badge') || '战略规划';
+
+        pageCounter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+        prevBtn.disabled = currentSlide === 0;
+        nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    function nextSlide() {
+        if (currentSlide < totalSlides - 1) {
+            currentSlide++;
+            updateSlide();
+        }
+    }
+
+    function prevSlide() {
+        if (currentSlide > 0) {
+            currentSlide--;
+            updateSlide();
+        }
+    }
+
+    function goToSlide(index) {
+        currentSlide = index;
+        updateSlide();
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            nextSlide();
+        } else if (e.key === 'ArrowLeft') {
+            prevSlide();
+        }
+    });
+
+    updateSlide();
+</script>
+
+</body>
+</html>
