@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASR 调度层五层核心流水线体系架构交互式全景图</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.02); }
+    }
+    .animate-pulse-slow {
+      animation: pulse-slow 3s infinite ease-in-out;
+    }
+    .pipeline-connector {
+      background: linear-gradient(180deg, rgba(99, 102, 241, 0.2) 0%, rgba(99, 102, 241, 0.8) 50%, rgba(99, 102, 241, 0.2) 100%);
+    }
+    .glow-card:hover {
+      box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.25), 0 8px 10px -6px rgba(99, 102, 241, 0.2);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans selection:bg-indigo-500 selection:text-white">
+
+  <!-- 顶部导航与 Header -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="p-2.5 bg-gradient-to-tr from-indigo-600 to-cyan-500 rounded-xl shadow-lg shadow-indigo-500/30">
+          <i data-lucide="cpu" class="w-7 h-7 text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">
+            ASR 调度层五层核心流水线体系架构
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-400">
+            Adaptive Service Routing & Multi-Agent Orchestration Architecture
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-ping"></span>
+          在线运行与就绪 (QoS: Normal)
+        </span>
+        <a href="#pipeline-diagram" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-500 transition text-white shadow-md shadow-indigo-600/30">
+          架构总览
+        </a>
+        <a href="#interactive-simulator" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 transition text-slate-200 border border-slate-700">
+          交互模拟器
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主体内容 -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+    <!-- 顶部引言 Banner -->
+    <section class="p-6 rounded-2xl bg-gradient-to-br from-indigo-950/60 via-slate-900 to-slate-900 border border-indigo-500/30 shadow-2xl relative overflow-hidden">
+      <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 max-w-4xl space-y-3">
+        <div class="inline-flex items-center space-x-2 text-indigo-400 text-xs font-mono uppercase tracking-wider">
+          <i data-lucide="layers" class="w-4 h-4"></i>
+          <span>Architecture Paradigm</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white">
+          从用户意图到去中心化服务协同的五阶确定性流水线
+        </h2>
+        <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+          ASR 调度层针对复杂业务场景与多源微服务集群，提供从<strong>意图槽位解析</strong>、<strong>并发能力探测</strong>、<strong>帕累托最优仲裁</strong>、<strong>跨域硬件/TEE上下文自动注入</strong>到<strong>DAG 级联编排与 Saga 补偿</strong>的一站式全链路解耦与自治编排能力。
+        </p>
+      </div>
+    </section>
+
+    <!-- 核心流水线五阶段图文展示卡片 -->
+    <section id="pipeline-diagram" class="space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="workflow" class="w-5 h-5 text-indigo-400"></i>
+            五层核心流水线结构详析
+          </h3>
+          <p class="text-xs text-slate-400 mt-1">
+            点击卡片可展开详细输入输出与核心底层技术
+          </p>
+        </div>
+        <span class="text-xs font-mono text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700">
+          Stage 1 to 5 Pipeline
+        </span>
+      </div>
+
+      <div class="space-y-6 relative">
+
+        <!-- 阶段 1 卡片 -->
+        <div class="glow-card transition duration-300 rounded-2xl bg-slate-900/90 border border-blue-500/30 p-6 relative overflow-hidden group">
+          <div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div class="space-y-3 max-w-2xl">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 font-bold flex items-center justify-center text-sm border border-blue-500/30">
+                  01
+                </span>
+                <span class="px-2.5 py-0.5 rounded text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  语义理解与本体提取
+                </span>
+                <h4 class="text-lg font-bold text-white group-hover:text-blue-400 transition">
+                  【阶段 1：意图槽位解析】
+                </h4>
+              </div>
+              <p class="text-slate-300 text-sm leading-relaxed">
+                <strong>核心流转：</strong>用户多模态输入 ➔ LLM 意图图谱建模 ➔ 提取 Intent ID 及动态必填/选填槽位元数据 (Slots)
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-400 pt-2">
+                <div class="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60 flex items-start gap-2">
+                  <i data-lucide="sparkles" class="w-4 h-4 text-blue-400 shrink-0 mt-0.5"></i>
+                  <span><strong>LLM 意图图谱建模：</strong>结合领域本体知识图谱，自适应对齐音视频/文本意图向量。</span>
+                </div>
+                <div class="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60 flex items-start gap-2">
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-blue-400 shrink-0 mt-0.5"></i>
+                  <span><strong>槽位分级：</strong>区分 Required 必填槽位与 Optional 偏好槽位，计算置信度。</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 数据流标识展示 -->
+            <div class="lg:w-80 bg-slate-950/80 rounded-xl p-3.5 border border-slate-800 text-xs font-mono text-slate-300 space-y-2 shrink-0">
+              <div class="text-blue-400 font-semibold flex items-center justify-between border-b border-slate-800 pb-1.5">
+                <span>Output Schema</span>
+                <span class="text-[10px] text-slate-500">JSON Contract</span>
+              </div>
+              <div class="text-[11px] leading-tight space-y-1 text-slate-400">
+                <p><span class="text-purple-400">intentId:</span> "mobility.ride_hailing"</p>
+                <p><span class="text-emerald-400">required:</span> ["dest", "origin"]</p>
+                <p><span class="text-amber-400">optional:</span> ["vehicleType", "silent"]</p>
+                <p><span class="text-blue-400">confidence:</span> 0.985</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 阶段 2 卡片 -->
+        <div class="glow-card transition duration-300 rounded-2xl bg-slate-900/90 border border-cyan-500/30 p-6 relative overflow-hidden group">
+          <div class="absolute top-0 left-0 w-2 h-full bg-cyan-500"></div>
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div class="space-y-3 max-w-2xl">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 font-bold flex items-center justify-center text-sm border border-cyan-500/30">
+                  02
+                </span>
+                <span class="px-2.5 py-0.5 rounded text-xs font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                  服务感知与状态遥测
+                </span>
+                <h4 class="text-lg font-bold text-white group-hover:text-cyan-400 transition">
+                  【阶段 2：多源并发匹配与探活】
+                </h4>
+              </div>
+              <p class="text-slate-300 text-sm leading-relaxed">
+                <strong>核心流转：</strong>基于标准化 Schema 广播能力探针 ➔ 并发获取候选元服务实时 QoS/报价/响应状态
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-400 pt-2">
+                <div class="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60 flex items-start gap-2">
+                  <i data-lucide="radio" class="w-4 h-4 text-cyan-400 shrink-0 mt-0.5"></i>
+                  <span><strong>标准化 Schema 探针：</strong>低开销并发广播，毫秒级轮询候选元服务端点。</span>
+                </div>
+                <div class="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60 flex items-start gap-2">
+                  <i data-lucide="gauge" class="w-4 h-4 text-cyan-400 shrink-0 mt-0.5"></i>
+                  <span><strong>多维遥测指标：</strong>动态汇聚 RTT 往返时延、SLA 可用性、价格报价与队列排队。</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 数据流标识展示 -->
+            <div class="lg:w-80 bg-slate-950/80 rounded-xl p-3.5 border border-slate-800 text-xs font-mono text-slate-300 space-y-2 shrink-0">
+              <div class="text-cyan-400 font-semibold flex items-center justify-between border-b border-slate-800 pb-1.5">
+                <span>Candidates Telemetry</span>
+                <span class="text-[10px] text-slate-500">Live Matrix</span>
+              </div>
+              <div class="text-[11px] leading-tight space-y-1 text-slate-400">
+                <p><span class="text-cyan-300">Provider A:</span> RTT 28ms | SLA 99.9% | ¥28</p>
+                <p><span class="text-cyan-300">Provider B:</span> RTT 18ms | SLA 98.5% | ¥32</p>
+                <p><span class="text-cyan-300">Provider C:</span> RTT 65ms | SLA 99.9% | ¥22</p>
+                <p><span class="text-emerald-400">Status:</span> 3/3 Healthy Responded</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 阶段 3 卡片 -->
+        <div class="glow-card transition duration-300 rounded-2xl bg-slate-900/90 border border-purple-500/30 p-6 relative overflow-hidden group">
+          <div class="absolute top-0 left-0 w-2 h-full bg-purple-500"></div>
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div class="space-y-3 max-w-2xl">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 font-bold flex items-center justify-center text-sm border border-purple-500/30">
+                  03
+                </span>
+                <span class="px-2.5 py-0.5 rounded text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                  多维博弈与路由裁决
+                </span>
+                <h4 class="text-lg font-bold text-white group-hover:text-purple-400 transition">
+                  【阶段 3：多目标动态路由仲裁 (替代排序竞价)】
+                </h4>
+              </div>
+              <p class="text-slate-300 text-sm leading-relaxed">
+                <strong>核心流转：</strong>帕累托最优仲裁算法 (综合权衡: 响应时延RTT + SLA成功率 + 价格/权益 + 系统清算权重)
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-400 pt-2">
+                <div class="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60 flex items-start gap-2">
+                  <i data-lucide="scale" class="w-4 h-4 text-purple-400 shrink-0 mt-0.5"></i>
+                  <span><strong>打破单一竞价绑架：</strong>构建多维目标函数，避免劣质低价或高价垄断破坏体验。</span>
+                </div>
+                <div class="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60 flex items-start gap-2">
+                  <i data-lucide="shield-check" class="w-4 h-4 text-purple-400 shrink-0 mt-0.5"></i>
+                  <span><strong>双通道保障机制：</strong>决策产生 Primary 主通道与 Hot-Standby 热备旁路，秒级容灾。</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 数据流标识展示 -->
+            <div class="lg:w-80 bg-slate-950/80 rounded-xl p-3.5 border border-slate-800 text-xs font-mono text-slate-300 space-y-2 shrink-0">
+              <div class="text-purple-400 font-semibold flex items-center justify-between border-b border-slate-800 pb-1.5">
+                <span>Pareto Frontier Decision</span>
+                <span class="text-[10px] text-slate-500">Arbitration</span>
+              </div>
+              <div class="text-[11px] leading-tight space-y-1 text-slate-400">
+                <p><span class="text-emerald-400 font-bold">★ Primary:</span> Provider A (Score: 0.94)</p>
+                <p><span class="text-amber-400 font-bold">⚡ Standby:</span> Provider B (Score: 0.91)</p>
+                <p><span class="text-slate-500">Weighting:</span> Latency 40% | SLA 30%</p>
+                <p><span class="text-slate-500">Settlement:</span> VIP Subsidy Tier-1</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 阶段 4 卡片 -->
+        <div class="glow-card transition duration-300 rounded-2xl bg-slate-900/90 border border-emerald-500/30 p-6 relative overflow-hidden group">
+          <div class="absolute top-0 left-0 w-2 h-full bg-emerald-500"></div>
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div class="space-y-3 max-w-2xl">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-sm border border-emerald-500/30">
+                  04
+                </span>
+                <span class="px-2.5 py-0.5 rounded text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  机密计算与参数自感知
+                </span>
+                <h4 class="text-lg font-bold text-white group-hover:text-emerald-400 transition">
+                  【阶段 4：跨域上下文自适应依赖注入 (参数补全)】
+                </h4>
+              </div>
+              <p class="text-slate-300 text-sm leading-relaxed">
+                <strong>核心流转：</strong>时空传感器 + TEE 隔离身份凭证 ➔ 零知识匿名 Token 管道化自动补全缺失槽位 (零人工输入)
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-400 pt-2">
+                <div class="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60 flex items-start gap-2">
+                  <i data-lucide="compass" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                  <span><strong>时空自感知：</strong>直接调用 GPS/网络基站/车载传感器获取定位与时间戳。</span>
+                </div>
+                <div class="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60 flex items-start gap-2">
+                  <i data-lucide="key-round" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                  <span><strong>TEE + 零知识 Token：</strong>真实身份信息保存在机密沙箱内，下发一次性脱敏 Token。</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 数据流标识展示 -->
+            <div class="lg:w-80 bg-slate-950/80 rounded-xl p-3.5 border border-slate-800 text-xs font-mono text-slate-300 space-y-2 shrink-0">
+              <div class="text-emerald-400 font-semibold flex items-center justify-between border-b border-slate-800 pb-1.5">
+                <span>Injected Payload</span>
+                <span class="text-[10px] text-slate-500">Zero-Input</span>
+              </div>
+              <div class="text-[11px] leading-tight space-y-1 text-slate-400">
+                <p><span class="text-emerald-300">origin:</span> "GPS:(30.27, 120.01)"</p>
+                <p><span class="text-emerald-300">auth:</span> "zkp_ephemeral_token_#9f82"</p>
+                <p><span class="text-emerald-300">userIntervention:</span> 0 (Automated)</p>
+                <p><span class="text-cyan-400">TEE Verification:</span> PASSED</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 阶段 5 卡片 -->
+        <div class="glow-card transition duration-300 rounded-2xl bg-slate-900/90 border border-amber-500/30 p-6 relative overflow-hidden group">
+          <div class="absolute top-0 left-0 w-2 h-full bg-amber-500"></div>
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div class="space-y-3 max-w-2xl">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center text-sm border border-amber-500/30">
+                  05
+                </span>
+                <span class="px-2.5 py-0.5 rounded text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  任务编排与分布式事务
+                </span>
+                <h4 class="text-lg font-bold text-white group-hover:text-amber-400 transition">
+                  【阶段 5：基于有向无环图 (DAG) 的级联编排与事务补偿 (任务编排)】
+                </h4>
+              </div>
+              <p class="text-slate-300 text-sm leading-relaxed">
+                <strong>核心流转：</strong>复合任务拆解为 DAG 节点 ➔ 跨服务输入输出 Pipe 传递 ➔ 无界面(Headless)原子执行 ➔ Saga回滚
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-400 pt-2">
+                <div class="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60 flex items-start gap-2">
+                  <i data-lucide="git-branch" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i>
+                  <span><strong>DAG 拓扑编译：</strong>自动支持并发 Fork、跨服务 Pipe 流转与汇聚同步栅栏 (Join Barrier)。</span>
+                </div>
+                <div class="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60 flex items-start gap-2">
+                  <i data-lucide="rotate-ccw" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i>
+                  <span><strong>Saga 事务引擎：</strong>失败时按拓扑依赖反向顺序执行原子补偿撤销，保障分布式强一致性。</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 数据流标识展示 -->
+            <div class="lg:w-80 bg-slate-950/80 rounded-xl p-3.5 border border-slate-800 text-xs font-mono text-slate-300 space-y-2 shrink-0">
+              <div class="text-amber-400 font-semibold flex items-center justify-between border-b border-slate-800 pb-1.5">
+                <span>Execution & Saga</span>
+                <span class="text-[10px] text-slate-500">Pipeline I/O</span>
+              </div>
+              <div class="text-[11px] leading-tight space-y-1 text-slate-400">
+                <p><span class="text-blue-400">Node 1 (Taxi):</span> SUCCESS (ETA 18:45)</p>
+                <p><span class="text-indigo-400">Node 2 (Dine):</span> SUCCESS (Seat #12)</p>
+                <p><span class="text-amber-400">Pipe Stream:</span> Output(1) ➔ Input(3)</p>
+                <p><span class="text-emerald-400">Saga Status:</span> ALL COMMITTED</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 交互式模拟运行器 (Interactive Simulator) -->
+    <section id="interactive-simulator" class="p-6 sm:p-8 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h3 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="play-circle" class="w-6 h-6 text-indigo-400"></i>
+            ASR 五层流水线交互式在线模拟器
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">
+            输入一段多模态自然语言指令，直观观察 5 个阶段在后台的执行流转与数据跃迁
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="runSimulation()" id="simulate-btn" class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-medium text-sm text-white transition shadow-lg shadow-indigo-600/30">
+            <i data-lucide="zap" class="w-4 h-4"></i>
+            <span>启动全链路调度执行</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 用户预置输入 -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="md:col-span-2 space-y-2">
+          <label class="block text-xs font-semibold text-slate-400">模拟用户多模态输入指令：</label>
+          <div class="relative">
+            <input id="user-input-text" type="text" value="帮我订今晚7点在西溪园区的商务会客，叫一辆商务车，并预订好附近的包厢" 
+              class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 font-sans shadow-inner">
+            <span class="absolute right-3 top-3 text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">
+              语音流 + 视线
+            </span>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-slate-400">路由仲裁场景偏好模式：</label>
+          <select id="arbitration-mode" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500">
+            <option value="balanced">均衡模式 (综合 RTT + SLA + 成本)</option>
+            <option value="latency">极致低延时优先 (RTT &lt; 20ms)</option>
+            <option value="cost">成本收益优先 (最高折扣 / VIP清算)</option>
+            <option value="fault">异常测试 (触发阶段5 Saga 反向补偿)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 实时模拟流水线状态步进展示 -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 pt-4">
+        <!-- Step 1 -->
+        <div id="sim-step-1" class="p-4 rounded-xl bg-slate-950 border border-slate-800 transition duration-300">
+          <div class="flex items-center justify-between text-xs mb-2">
+            <span class="font-bold text-blue-400">阶段 1</span>
+            <span id="badge-step-1" class="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400">待触发</span>
+          </div>
+          <div class="text-sm font-semibold text-white">意图槽位解析</div>
+          <div id="log-step-1" class="text-xs text-slate-500 mt-2 font-mono h-16 overflow-hidden">等待输入流...</div>
+        </div>
+
+        <!-- Step 2 -->
+        <div id="sim-step-2" class="p-4 rounded-xl bg-slate-950 border border-slate-800 transition duration-300">
+          <div class="flex items-center justify-between text-xs mb-2">
+            <span class="font-bold text-cyan-400">阶段 2</span>
+            <span id="badge-step-2" class="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400">待触发</span>
+          </div>
+          <div class="text-sm font-semibold text-white">多源并发探活</div>
+          <div id="log-step-2" class="text-xs text-slate-500 mt-2 font-mono h-16 overflow-hidden">探针未发射...</div>
+        </div>
+
+        <!-- Step 3 -->
+        <div id="sim-step-3" class="p-4 rounded-xl bg-slate-950 border border-slate-800 transition duration-300">
+          <div class="flex items-center justify-between text-xs mb-2">
+            <span class="font-bold text-purple-400">阶段 3</span>
+            <span id="badge-step-3" class="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400">待触发</span>
+          </div>
+          <div class="text-sm font-semibold text-white">动态路由仲裁</div>
+          <div id="log-step-3" class="text-xs text-slate-500 mt-2 font-mono h-16 overflow-hidden">无候选矩阵...</div>
+        </div>
+
+        <!-- Step 4 -->
+        <div id="sim-step-4" class="p-4 rounded-xl bg-slate-950 border border-slate-800 transition duration-300">
+          <div class="flex items-center justify-between text-xs mb-2">
+            <span class="font-bold text-emerald-400">阶段 4</span>
+            <span id="badge-step-4" class="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400">待触发</span>
+          </div>
+          <div class="text-sm font-semibold text-white">跨域依赖注入</div>
+          <div id="log-step-4" class="text-xs text-slate-500 mt-2 font-mono h-16 overflow-hidden">传感器/TEE待命...</div>
+        </div>
+
+        <!-- Step 5 -->
+        <div id="sim-step-5" class="p-4 rounded-xl bg-slate-950 border border-slate-800 transition duration-300">
+          <div class="flex items-center justify-between text-xs mb-2">
+            <span class="font-bold text-amber-400">阶段 5</span>
+            <span id="badge-step-5" class="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400">待触发</span>
+          </div>
+          <div class="text-sm font-semibold text-white">DAG 编排与补偿</div>
+          <div id="log-step-5" class="text-xs text-slate-500 mt-2 font-mono h-16 overflow-hidden">等待拓扑执行...</div>
+        </div>
+      </div>
+
+      <!-- 实时运行输出日志终端面板 -->
+      <div class="p-4 rounded-xl bg-black border border-slate-800 font-mono text-xs text-slate-300 space-y-1">
+        <div class="flex items-center justify-between text-slate-500 pb-2 border-b border-slate-800 text-[11px]">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-red-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-green-500/80"></span>
+            <span class="ml-2">ASR Pipeline Engine Console Output</span>
+          </div>
+          <span id="console-timestamp">Ready</span>
+        </div>
+        <div id="console-logs" class="pt-2 space-y-1 max-h-48 overflow-y-auto">
+          <div class="text-slate-500">系统已初始化，五层调度引擎就绪，点击上方按钮触发链路执行。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 核心优势与技术对比 -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+          <i data-lucide="shield" class="w-5 h-5"></i>
+        </div>
+        <h4 class="text-base font-bold text-white">TEE + 零知识机密安全</h4>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          用户身份与支付凭证完全隔离于硬件级 TEE 安全区，以零知识匿名 Token 管道化流动，杜绝跨平台调用中的隐私泄漏。
+        </p>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center">
+          <i data-lucide="git-pull-request" class="w-5 h-5"></i>
+        </div>
+        <h4 class="text-base font-bold text-white">帕累托最优仲裁引擎</h4>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          革新传统单一价格竞价机制，引入非支配解集多目标博弈，动态平衡网络时延、SLA 可用率、运营配额与系统清算权重。
+        </p>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+          <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+        </div>
+        <h4 class="text-base font-bold text-white">DAG Headless 事务回滚</h4>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          复合多意图原子化编译为 DAG 拓扑图，跨微服务管道直接数据交互，遇到异常由 Saga 状态机自动逆向补偿回滚。
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="border-t border-slate-800 mt-16 py-8 text-center text-xs text-slate-500">
+    <p>ASR (Adaptive Service Routing) Architecture Framework © 2026. Designed for Autonomous Multi-Agent & Microservices Ecosystem.</p>
+  </footer>
+
+  <script>
+    // 初始化 Lucide 图标
+    lucide.createIcons();
+
+    function logToConsole(msg, type = 'info') {
+      const logs = document.getElementById('console-logs');
+      const time = new Date().toISOString().substring(11, 23);
+      const div = document.createElement('div');
+      
+      let colorClass = 'text-slate-300';
+      if (type === 'success') colorClass = 'text-emerald-400';
+      if (type === 'warn') colorClass = 'text-amber-400';
+      if (type === 'error') colorClass = 'text-rose-400';
+      if (type === 'cyan') colorClass = 'text-cyan-400';
+      if (type === 'purple') colorClass = 'text-purple-400';
+
+      div.className = `${colorClass} text-xs font-mono`;
+      div.innerHTML = `<span class="text-slate-600">[${time}]</span> ${msg}`;
+      logs.appendChild(div);
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    async function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function runSimulation() {
+      const btn = document.getElementById('simulate-btn');
+      const mode = document.getElementById('arbitration-mode').value;
+      const text = document.getElementById('user-input-text').value;
+
+      btn.disabled = true;
+      btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+      // 重置所有卡片状态
+      for (let i = 1; i <= 5; i++) {
+        document.getElementById(`sim-step-${i}`).className = 'p-4 rounded-xl bg-slate-950 border border-slate-800 transition duration-300';
+        document.getElementById(`badge-step-${i}`).className = 'px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400';
+        document.getElementById(`badge-step-${i}`).innerText = '执行中...';
+      }
+
+      document.getElementById('console-logs').innerHTML = '';
+      logToConsole(`>>> 接收多模态输入流: "${text}"`, 'info');
+
+      // Stage 1
+      document.getElementById('sim-step-1').className = 'p-4 rounded-xl bg-blue-950/40 border border-blue-500 shadow-lg shadow-blue-500/20';
+      document.getElementById('badge-step-1').className = 'px-1.5 py-0.5 rounded text-[10px] bg-blue-500 text-white font-bold animate-pulse';
+      document.getElementById('log-step-1').innerHTML = `<span class="text-blue-300">LLM 图谱解析...</span><br>Intent: Ride + Dine`;
+      logToConsole('[阶段 1] LLM 图谱建模匹配中... 识别复合意图: [出行叫车] + [餐饮订座]', 'cyan');
+      await sleep(600);
+      logToConsole('[阶段 1] 成功抽取必填槽位: Destination, DepartureTime, PartySize; 待补槽位: Origin, UserToken', 'success');
+      document.getElementById('badge-step-1').innerText = '已完成';
+      document.getElementById('badge-step-1').className = 'px-1.5 py-0.5 rounded text-[10px] bg-blue-500/20 text-blue-400 border border-blue-500/30';
+
+      // Stage 2
+      document.getElementById('sim-step-2').className = 'p-4 rounded-xl bg-cyan-950/40 border border-cyan-500 shadow-lg shadow-cyan-500/20';
+      document.getElementById('badge-step-2').className = 'px-1.5 py-0.5 rounded text-[10px] bg-cyan-500 text-white font-bold animate-pulse';
+      document.getElementById('log-step-2').innerHTML = `<span class="text-cyan-300">探针广播中...</span><br>并发获取 3 家服务QoS`;
+      logToConsole('[阶段 2] 基于 Schema 广播能力探针，并发探测分布式服务注册网格...', 'cyan');
+      await sleep(700);
+      logToConsole('[阶段 2] 探测响应: Provider Alpha (RTT 24ms, SLA 99.9%), Provider Beta (RTT 16ms, SLA 98.2%), Provider Gamma (RTT 45ms)', 'success');
+      document.getElementById('badge-step-2').innerText = '已完成';
+      document.getElementById('badge-step-2').className = 'px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';
+
+      // Stage 3
+      document.getElementById('sim-step-3').className = 'p-4 rounded-xl bg-purple-950/40 border border-purple-500 shadow-lg shadow-purple-500/20';
+      document.getElementById('badge-step-3').className = 'px-1.5 py-0.5 rounded text-[10px] bg-purple-500 text-white font-bold animate-pulse';
+      document.getElementById('log-step-3').innerHTML = `<span class="text-purple-300">帕累托前沿仲裁...</span><br>模式: ${mode}`;
+      logToConsole(`[阶段 3] 执行多目标动态路由仲裁 (模式: ${mode})，计算 Pareto Frontier 非支配解...`, 'purple');
+      await sleep(800);
+      logToConsole('[阶段 3] 仲裁产出: Primary 路由 [Provider Alpha], Standby 旁路 [Provider Beta], 避免单一价格绑架', 'success');
+      document.getElementById('badge-step-3').innerText = '已完成';
+      document.getElementById('badge-step-3').className = 'px-1.5 py-0.5 rounded text-[10px] bg-purple-500/20 text-purple-400 border border-purple-500/30';
+
+      // Stage 4
+      document.getElementById('sim-step-4').className = 'p-4 rounded-xl bg-emerald-950/40 border border-emerald-500 shadow-lg shadow-emerald-500/20';
+      document.getElementById('badge-step-4').className = 'px-1.5 py-0.5 rounded text-[10px] bg-emerald-500 text-white font-bold animate-pulse';
+      document.getElementById('log-step-4').innerHTML = `<span class="text-emerald-300">TEE+传感器注水...</span><br>0人工介入自动补全`;
+      logToConsole('[阶段 4] 激活时空传感器自感知: 读取 GPS 坐标 ➔ 自动注入 Origin 始发地', 'cyan');
+      await sleep(600);
+      logToConsole('[阶段 4] 进入硬件 TEE 机密隔离沙箱: 生成一次性零知识证明匿名 Token (ZKP-Token)，实现 0 人工干预', 'success');
+      document.getElementById('badge-step-4').innerText = '已完成';
+      document.getElementById('badge-step-4').className = 'px-1.5 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+
+      // Stage 5
+      document.getElementById('sim-step-5').className = 'p-4 rounded-xl bg-amber-950/40 border border-amber-500 shadow-lg shadow-amber-500/20';
+      document.getElementById('badge-step-5').className = 'px-1.5 py-0.5 rounded text-[10px] bg-amber-500 text-white font-bold animate-pulse';
+      document.getElementById('log-step-5').innerHTML = `<span class="text-amber-300">DAG Headless 执行...</span><br>跨服务管道传递`;
+      logToConsole('[阶段 5] 编译 DAG 有向无环图: Task[CallTaxi] || Task[ReserveTable] ➔ Pipe ➔ Task[EscrowPay]', 'info');
+      await sleep(900);
+
+      if (mode === 'fault') {
+        logToConsole('[阶段 5 异常仿真] 下游支付接口网络超时 (HTTP 504 Gateway Timeout)', 'error');
+        logToConsole('[阶段 5 Saga 引擎] 激活分布式事务逆向补偿链: Compensate(CancelTable) ➔ Compensate(CancelTaxi)', 'warn');
+        await sleep(600);
+        logToConsole('[阶段 5 Saga 引擎] 全部补偿执行完毕，分布式状态已恢复最终一致性，向用户推送友好降级通知。', 'success');
+        document.getElementById('badge-step-5').innerText = 'Saga补偿完毕';
+        document.getElementById('badge-step-5').className = 'px-1.5 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30';
+      } else {
+        logToConsole('[阶段 5] 无界面 (Headless) 跨服务原子执行成功: 行程已预约 (司机接单中)，西溪包厢已预留！', 'success');
+        document.getElementById('badge-step-5').innerText = '已执行';
+        document.getElementById('badge-step-5').className = 'px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/30';
+      }
+
+      btn.disabled = false;
+      btn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+  </script>
+</body>
+</html>
