@@ -286,47 +286,66 @@ flowchart TD
 
 ## 3. 端到端业务全流程时序图
 
-以用户多模态口令“**帮我安排晚上7点在西溪园区的商务会客，叫一辆商务车，并预订好附近的包厢**”为例，五阶段流水线的整体调用链路如下：
+以典型业务场景为例，系统涵盖六大核心参与方：**用户/传感器**、**小艺/接入层**、**ASR 路由中枢**、**候选元服务集群**、**TEE/钱包安全区** 以及 **任务编排引擎**。详细时序流转及阶段注释如下：
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor User as 用户 (多模态端)
-    participant P1 as 阶段 1: 意图槽位解析
-    participant P2 as 阶段 2: 多源并发匹配与探活
-    participant P3 as 阶段 3: 多目标帕累托动态路由
-    participant P4 as 阶段 4: 跨域上下文依赖注入
-    participant P5 as 阶段 5: DAG 级联编排与事务引擎
-    participant Ext as 外部生态服务矩阵 (出行/酒旅/支付)
+    actor User as 用户/传感器
+    participant Gateway as 小艺/接入层
+    participant ASR as ASR 路由中枢
+    participant Services as 候选元服务集群
+    participant TEE as TEE/钱包安全区
+    participant DAG as 任务编排引擎
 
-    User->>P1: 语音流 + 视线朝向 + 语义输入
-    P1->>P1: LLM 意图图谱建模 ➔ 拆解为 Intent[Ride] + Intent[Dine]
-    P1->>P1: 识别必填槽位: Destination, VehicleType, Time, PartySize
-
-    P1->>P2: 广播标准化能力探针 (Capability Probe)
-    P2->>Ext: 并发探测网约车平台 (A/B/C) 与餐饮平台 (X/Y)
-    Ext-->>P2: 回传实时指标: [RTT, SLA, 实时运力价格, 席位状态]
-
-    P2->>P3: 投递候选服务度量矩阵
-    P3->>P3: 执行帕累托最优仲裁算法 (均衡时延、成功率、VIP优惠与清算权重)
-    P3-->>P4: 决出最优提供方拓扑 (Primary Route + Standby Route)
-
-    P4->>P4: 探测缺失槽位 (如当前位置、用户支付授权、隐私联系人)
-    P4->>P4: 调取 GPS/车载传感器 ➔ 注入实时精确起始点
-    P4->>P4: TEE 硬件机密隔离调用 ➔ 签发零知识匿名通行 Token (ZKP-Token)
-
-    P4->>P5: 装配好完整参数与凭证的复合任务
-    P5->>P5: 构建 DAG 拓扑: [打车] + [订座] 并发 ➔ 串联 [预约入场/支付]
-    P5->>Ext: 无界面 (Headless) 原子调用触发执行
-    alt 顺利执行
-        Ext-->>P5: 全部子服务 ACK
-        P5-->>User: 统一向端侧汇报执行结果 (行程已预约，包厢已确认)
-    else 任意环节发生异常
-        Ext-->>P5: 订座成功但打车因暴雨无运力超时
-        P5->>P5: 激活 Saga 补偿控制器
-        P5->>Ext: 自动调用已成功环节的撤销 API (取消订座)
-        P5-->>User: 友好通知异常并提供替代降级方案
+    %% 阶段 1：自然交互与接入解析
+    rect rgb(30, 41, 59)
+    note over User, ASR: 【阶段 1：多模态输入与意图槽位提取】
+    User->>Gateway: 1. 自然语言请求 (语音/视线/手势多模态指令)
+    Gateway->>ASR: 2. 语义与环境上下文 (音频流/文本/时空元数据)
+    ASR->>ASR: 3. 意图识别与槽位提取 (LLM图谱建模，识别Intent ID与必填/选填Slots)
     end
+
+    %% 阶段 2：多源探活与能力探测
+    rect rgb(15, 23, 42)
+    note over ASR, Services: 【阶段 2：多源并发匹配与探活】
+    ASR->>Services: 4. 并发广播探针包 (基于标准化能力Schema广播Probe)
+    Services-->>ASR: 5. 返回SLA/报价/RTT (实时遥测网络时延、动态运价/资费及节点健康度)
+    end
+
+    %% 阶段 3：多目标动态路由仲裁
+    rect rgb(30, 41, 59)
+    note over ASR: 【阶段 3：多目标动态路由仲裁】
+    ASR->>ASR: 6. 多目标动态路由仲裁 (计算Pareto综合得分，平衡RTT+SLA+价格+清算权重，锁定最优服务拓扑)
+    end
+
+    %% 阶段 4：自适应依赖注入与机密安全凭证
+    rect rgb(15, 23, 42)
+    note over ASR, TEE: 【阶段 4：跨域上下文自适应依赖注入 (零人工输入)】
+    ASR->>ASR: 7. 检测槽位完整性 (发现缺失常旅客号/定位/优惠券等关键参数)
+    ASR->>TEE: 8. 请求上下文注入 (触发TEE机密隔离鉴权与传感器时空上下文拉取)
+    TEE-->>ASR: 9. 返回单次匿名Token (派发ZKP匿名临时凭证，自适应完成槽位参数全自动补全)
+    end
+
+    %% 阶段 5：DAG任务编排与Saga事务保障
+    rect rgb(30, 41, 59)
+    note over ASR, DAG: 【阶段 5：基于DAG的级联编排与事务补偿】
+    ASR->>DAG: 10. 构建任务DAG拓扑流 (跨服务级联传递，组装复合任务有向无环依赖图)
+    
+    critical Headless API原子执行
+        DAG->>Services: 11. 执行Headless API (静默原子化调用，跨服务I/O管道直通)
+        Services-->>DAG: 业务成功ACK响应
+    option 异常触发Saga事务反向补偿
+        Services-->>DAG: 节点异常/超时/风控阻断
+        DAG->>Services: 启动Saga反向补偿链 (逆向撤销已执行子任务，保证最终一致性)
+    end
+
+    DAG-->>ASR: 12. 返回最终执行成功状态与实况包 (完整业务执行单据与上下文)
+    end
+
+    %% 最终端侧闭环播报
+    ASR-->>Gateway: 13. 毫秒级反馈播报 (结构化应答数据包)
+    Gateway-->>User: 14. 语音/端侧卡片播报执行结果 ("已为您预约车辆并锁定包厢")
 ```
 
 ---
