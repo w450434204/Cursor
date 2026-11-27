@@ -1,0 +1,2477 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="华为手机负一屏 MAU 增长与用户心智建设策略汇报"
+    />
+    <title>负一屏增长战略｜汇报版</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='13' fill='%23c7000b'/></svg>"
+    />
+    <style>
+      :root {
+        --red: #c7000b;
+        --red-dark: #8f0008;
+        --red-soft: #f7e8e9;
+        --ink: #151515;
+        --ink-2: #3f3f3d;
+        --muted: #73736f;
+        --muted-2: #9a9a95;
+        --paper: #ffffff;
+        --canvas: #f2f2ef;
+        --soft: #f7f7f4;
+        --line: #deded9;
+        --line-strong: #c6c6c0;
+        --green: #30765a;
+        --green-soft: #e8f2ed;
+        --blue: #326a88;
+        --blue-soft: #e9f1f5;
+        --amber: #95691f;
+        --amber-soft: #f8f0df;
+        --radius-sm: 10px;
+        --radius: 18px;
+        --radius-lg: 28px;
+        --page-x: clamp(28px, 6vw, 104px);
+        --font:
+          "SF Pro Display", "SF Pro Text", "PingFang SC",
+          "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        scroll-snap-type: y mandatory;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background: var(--canvas);
+        font-family: var(--font);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      button {
+        border: 0;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      button:focus-visible,
+      a:focus-visible {
+        outline: 3px solid rgba(199, 0, 11, 0.24);
+        outline-offset: 3px;
+      }
+
+      .progress {
+        position: fixed;
+        z-index: 100;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 4px;
+        background: var(--red);
+        transition: width 220ms ease;
+      }
+
+      .topbar {
+        position: fixed;
+        z-index: 90;
+        top: 0;
+        right: 0;
+        left: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+        padding: 0 var(--page-x);
+        border-bottom: 1px solid rgba(21, 21, 21, 0.08);
+        background: rgba(242, 242, 239, 0.92);
+        backdrop-filter: blur(16px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 12px;
+        font-weight: 750;
+        letter-spacing: 0.12em;
+      }
+
+      .brand-mark {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--red);
+      }
+
+      .brand span:last-child {
+        color: var(--muted);
+        font-weight: 560;
+        letter-spacing: 0.03em;
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .page-count {
+        min-width: 56px;
+        margin-right: 6px;
+        color: var(--muted);
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+      }
+
+      .utility-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 32px;
+        padding: 0 12px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--paper);
+        font-size: 11px;
+        font-weight: 650;
+      }
+
+      .utility-button:hover {
+        border-color: var(--line-strong);
+        background: var(--soft);
+      }
+
+      .utility-button svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      .slide-nav {
+        position: fixed;
+        z-index: 80;
+        top: 50%;
+        right: 22px;
+        display: grid;
+        gap: 9px;
+        transform: translateY(-50%);
+      }
+
+      .nav-dot {
+        position: relative;
+        width: 8px;
+        height: 8px;
+        padding: 0;
+        border: 1px solid var(--muted-2);
+        border-radius: 50%;
+        background: transparent;
+        transition:
+          background 160ms ease,
+          border-color 160ms ease,
+          transform 160ms ease;
+      }
+
+      .nav-dot::before {
+        position: absolute;
+        top: -7px;
+        right: -7px;
+        bottom: -7px;
+        left: -7px;
+        content: "";
+      }
+
+      .nav-dot:hover,
+      .nav-dot.is-active {
+        border-color: var(--red);
+        background: var(--red);
+        transform: scale(1.2);
+      }
+
+      .slide {
+        position: relative;
+        display: flex;
+        min-height: 100svh;
+        padding: 94px var(--page-x) 54px;
+        overflow: hidden;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+      }
+
+      .slide:nth-child(even) {
+        background: var(--paper);
+      }
+
+      .slide:nth-child(odd) {
+        background: var(--canvas);
+      }
+
+      .slide-inner {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+        max-width: 1440px;
+        margin: 0 auto;
+      }
+
+      .slide-number {
+        position: absolute;
+        right: var(--page-x);
+        bottom: 28px;
+        color: var(--muted-2);
+        font-size: 11px;
+        font-weight: 650;
+        letter-spacing: 0.12em;
+      }
+
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 12px;
+        color: var(--red);
+        font-size: 11px;
+        font-weight: 760;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::before {
+        width: 26px;
+        height: 2px;
+        background: currentColor;
+        content: "";
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        max-width: 900px;
+        margin-bottom: 22px;
+        font-size: clamp(46px, 6vw, 86px);
+        font-weight: 680;
+        letter-spacing: -0.065em;
+        line-height: 1.04;
+      }
+
+      h2 {
+        margin-bottom: 12px;
+        font-size: clamp(30px, 3.5vw, 52px);
+        font-weight: 670;
+        letter-spacing: -0.05em;
+        line-height: 1.08;
+      }
+
+      h3 {
+        margin-bottom: 8px;
+        font-size: 18px;
+        font-weight: 680;
+        letter-spacing: -0.025em;
+      }
+
+      .subtitle {
+        max-width: 820px;
+        margin-bottom: 0;
+        color: var(--muted);
+        font-size: clamp(16px, 1.6vw, 22px);
+        line-height: 1.65;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 40px;
+        margin-bottom: clamp(28px, 4vh, 48px);
+      }
+
+      .section-head h2 {
+        margin-bottom: 0;
+      }
+
+      .section-summary {
+        max-width: 440px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .red {
+        color: var(--red);
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .fine-print {
+        color: var(--muted-2);
+        font-size: 11px;
+        line-height: 1.6;
+      }
+
+      .cover {
+        background:
+          linear-gradient(90deg, var(--canvas) 0 70%, var(--ink) 70% 100%) !important;
+      }
+
+      .cover .slide-inner {
+        display: grid;
+        grid-template-columns: minmax(0, 1.7fr) minmax(300px, 0.72fr);
+        gap: clamp(42px, 8vw, 130px);
+        align-items: center;
+      }
+
+      .cover-copy {
+        min-width: 0;
+      }
+
+      .cover-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 30px;
+        padding: 7px 12px;
+        border: 1px solid var(--line-strong);
+        border-radius: 999px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 680;
+        letter-spacing: 0.08em;
+      }
+
+      .cover-label i {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--red);
+      }
+
+      .cover h1 span {
+        display: block;
+        color: var(--red);
+      }
+
+      .cover-statement {
+        max-width: 710px;
+        margin-top: 34px;
+        padding: 17px 0 17px 18px;
+        border-left: 3px solid var(--red);
+        color: var(--ink-2);
+        font-size: clamp(16px, 1.6vw, 21px);
+        font-weight: 580;
+        line-height: 1.6;
+      }
+
+      .cover-panel {
+        position: relative;
+        z-index: 2;
+        color: var(--paper);
+      }
+
+      .cover-panel-label {
+        margin-bottom: 26px;
+        color: rgba(255, 255, 255, 0.52);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+      }
+
+      .cover-point {
+        padding: 20px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.16);
+      }
+
+      .cover-point:last-child {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+      }
+
+      .cover-point small {
+        display: block;
+        margin-bottom: 7px;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 10px;
+      }
+
+      .cover-point strong {
+        display: block;
+        font-size: 16px;
+        font-weight: 610;
+        line-height: 1.5;
+      }
+
+      .executive-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+
+      .executive-card {
+        position: relative;
+        min-height: 255px;
+        padding: 28px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper);
+      }
+
+      .executive-card:first-child {
+        border-top: 4px solid var(--red);
+      }
+
+      .executive-card:nth-child(2) {
+        border-top: 4px solid var(--ink);
+      }
+
+      .executive-card:nth-child(3) {
+        border-top: 4px solid var(--green);
+      }
+
+      .card-index {
+        display: inline-grid;
+        width: 31px;
+        height: 31px;
+        margin-bottom: 34px;
+        place-items: center;
+        border-radius: 50%;
+        color: var(--muted);
+        background: var(--soft);
+        font-size: 11px;
+        font-weight: 740;
+      }
+
+      .executive-card p {
+        margin-bottom: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.65;
+      }
+
+      .decision-strip {
+        display: grid;
+        grid-template-columns: 160px 1fr;
+        gap: 26px;
+        align-items: center;
+        margin-top: 26px;
+        padding: 21px 26px;
+        border-radius: var(--radius);
+        color: var(--paper);
+        background: var(--ink);
+      }
+
+      .decision-strip span {
+        color: rgba(255, 255, 255, 0.54);
+        font-size: 11px;
+        font-weight: 720;
+        letter-spacing: 0.1em;
+      }
+
+      .decision-strip strong {
+        font-size: 17px;
+        font-weight: 580;
+        line-height: 1.55;
+      }
+
+      .comparison {
+        display: grid;
+        grid-template-columns: 1fr 74px 1fr;
+        align-items: stretch;
+      }
+
+      .comparison-panel {
+        padding: 30px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        background: var(--paper);
+      }
+
+      .comparison-panel.target {
+        border-color: var(--red);
+        background: var(--red-soft);
+      }
+
+      .comparison-label {
+        display: inline-block;
+        margin-bottom: 22px;
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 760;
+        letter-spacing: 0.13em;
+      }
+
+      .comparison-panel.target .comparison-label {
+        color: var(--red);
+      }
+
+      .flow-line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 26px 0 30px;
+        overflow: hidden;
+      }
+
+      .flow-node {
+        flex: 1;
+        min-width: 0;
+        padding: 13px 8px;
+        border-radius: var(--radius-sm);
+        background: var(--soft);
+        font-size: 12px;
+        font-weight: 650;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .target .flow-node {
+        background: var(--paper);
+      }
+
+      .flow-arrow {
+        flex: 0 0 auto;
+        color: var(--muted-2);
+        font-size: 14px;
+      }
+
+      .issue-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px 20px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .issue-list li {
+        display: flex;
+        gap: 9px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .issue-list li::before {
+        flex: 0 0 6px;
+        width: 6px;
+        height: 6px;
+        margin-top: 7px;
+        border-radius: 50%;
+        background: var(--red);
+        content: "";
+      }
+
+      .comparison-arrow {
+        display: grid;
+        place-items: center;
+        color: var(--red);
+        font-size: 30px;
+      }
+
+      .positioning-layout {
+        display: grid;
+        grid-template-columns: minmax(310px, 0.8fr) minmax(0, 1.2fr);
+        gap: clamp(32px, 6vw, 90px);
+        align-items: center;
+      }
+
+      .positioning-core {
+        position: relative;
+        display: grid;
+        min-height: 380px;
+        padding: 36px;
+        place-items: center;
+        border: 1px solid var(--line-strong);
+        border-radius: 50%;
+        text-align: center;
+      }
+
+      .positioning-core::before,
+      .positioning-core::after {
+        position: absolute;
+        border: 1px solid var(--line);
+        border-radius: 50%;
+        content: "";
+      }
+
+      .positioning-core::before {
+        inset: 24px;
+      }
+
+      .positioning-core::after {
+        inset: 52px;
+      }
+
+      .positioning-core > div {
+        position: relative;
+        z-index: 2;
+        max-width: 260px;
+      }
+
+      .positioning-core small {
+        color: var(--red);
+        font-size: 10px;
+        font-weight: 760;
+        letter-spacing: 0.14em;
+      }
+
+      .positioning-core strong {
+        display: block;
+        margin-top: 12px;
+        font-size: 25px;
+        font-weight: 650;
+        line-height: 1.48;
+      }
+
+      .principle-list {
+        display: grid;
+        gap: 1px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--line);
+      }
+
+      .principle {
+        display: grid;
+        grid-template-columns: 44px 150px 1fr;
+        gap: 18px;
+        align-items: center;
+        min-height: 82px;
+        padding: 16px 22px;
+        background: var(--paper);
+      }
+
+      .principle b {
+        color: var(--red);
+        font-size: 12px;
+      }
+
+      .principle strong {
+        font-size: 15px;
+      }
+
+      .principle span {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      .not-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 16px;
+      }
+
+      .not-list span {
+        padding: 7px 11px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--muted);
+        background: var(--soft);
+        font-size: 11px;
+      }
+
+      .metric-layout {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 28px;
+      }
+
+      .north-star {
+        padding: 30px;
+        border: 1px solid var(--red);
+        border-radius: var(--radius-lg);
+        background: var(--red-soft);
+      }
+
+      .north-star-label {
+        color: var(--red);
+        font-size: 10px;
+        font-weight: 760;
+        letter-spacing: 0.14em;
+      }
+
+      .north-star h3 {
+        margin: 12px 0 8px;
+        font-size: clamp(24px, 2.6vw, 38px);
+      }
+
+      .north-star p {
+        max-width: 640px;
+        margin-bottom: 24px;
+        color: var(--ink-2);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .metric-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .metric-tags span {
+        padding: 7px 10px;
+        border-radius: 999px;
+        color: var(--red-dark);
+        background: var(--paper);
+        font-size: 11px;
+        font-weight: 620;
+      }
+
+      .mau-equation {
+        display: grid;
+        grid-template-columns: repeat(7, auto);
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 20px;
+        padding: 24px 18px;
+        border-radius: var(--radius);
+        background: var(--ink);
+      }
+
+      .equation-term {
+        padding: 11px 12px;
+        border-radius: var(--radius-sm);
+        color: var(--paper);
+        background: rgba(255, 255, 255, 0.1);
+        font-size: 12px;
+        font-weight: 650;
+        text-align: center;
+      }
+
+      .equation-sign {
+        color: rgba(255, 255, 255, 0.54);
+        font-size: 16px;
+      }
+
+      .metric-table {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper);
+      }
+
+      .metric-row {
+        display: grid;
+        grid-template-columns: 90px 1fr;
+        min-height: 74px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .metric-row:last-child {
+        border-bottom: 0;
+      }
+
+      .metric-row > strong {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border-right: 1px solid var(--line);
+        font-size: 12px;
+      }
+
+      .metric-row > div {
+        padding: 14px 16px;
+      }
+
+      .metric-row b {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 13px;
+      }
+
+      .metric-row span {
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.5;
+      }
+
+      .matrix-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.3fr) minmax(260px, 0.7fr);
+        gap: 36px;
+        align-items: center;
+      }
+
+      .matrix-wrap {
+        position: relative;
+        padding: 0 0 32px 36px;
+      }
+
+      .matrix {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, minmax(150px, 1fr));
+        gap: 8px;
+        min-height: 355px;
+      }
+
+      .quadrant {
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper);
+      }
+
+      .quadrant.priority {
+        border: 2px solid var(--red);
+        background: var(--red-soft);
+      }
+
+      .quadrant strong {
+        display: block;
+        margin-bottom: 7px;
+        font-size: 16px;
+      }
+
+      .quadrant p {
+        margin-bottom: 12px;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.55;
+      }
+
+      .quadrant div {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+
+      .quadrant span {
+        padding: 4px 7px;
+        border-radius: 999px;
+        color: var(--ink-2);
+        background: var(--soft);
+        font-size: 10px;
+      }
+
+      .priority span {
+        background: var(--paper);
+      }
+
+      .axis-x,
+      .axis-y {
+        position: absolute;
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 670;
+        letter-spacing: 0.04em;
+      }
+
+      .axis-x {
+        right: 0;
+        bottom: 2px;
+        left: 36px;
+        text-align: center;
+      }
+
+      .axis-x::after {
+        display: inline-block;
+        width: 54%;
+        height: 1px;
+        margin-left: 10px;
+        vertical-align: middle;
+        background: var(--line-strong);
+        content: "";
+      }
+
+      .axis-y {
+        top: 50%;
+        left: -26px;
+        transform: rotate(-90deg);
+      }
+
+      .scoring-card {
+        padding: 26px;
+        border-radius: var(--radius);
+        color: var(--paper);
+        background: var(--ink);
+      }
+
+      .scoring-card h3 {
+        margin-bottom: 18px;
+      }
+
+      .score-formula {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 22px;
+      }
+
+      .score-line {
+        display: grid;
+        grid-template-columns: 22px 1fr;
+        gap: 8px;
+        color: rgba(255, 255, 255, 0.76);
+        font-size: 12px;
+      }
+
+      .score-line b {
+        color: var(--paper);
+      }
+
+      .score-rule {
+        padding-top: 18px;
+        border-top: 1px solid rgba(255, 255, 255, 0.16);
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 11px;
+        line-height: 1.6;
+      }
+
+      .architecture {
+        display: grid;
+        grid-template-columns: repeat(11, auto);
+        align-items: stretch;
+        gap: 8px;
+        margin: 8px 0 34px;
+      }
+
+      .arch-node {
+        display: flex;
+        min-height: 120px;
+        padding: 16px 12px;
+        flex-direction: column;
+        justify-content: space-between;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper);
+      }
+
+      .arch-node b {
+        color: var(--red);
+        font-size: 10px;
+        letter-spacing: 0.1em;
+      }
+
+      .arch-node strong {
+        font-size: 14px;
+      }
+
+      .arch-node span {
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.45;
+      }
+
+      .arch-arrow {
+        display: grid;
+        place-items: center;
+        color: var(--muted-2);
+      }
+
+      .example-strip {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: 24px;
+        align-items: center;
+        padding: 24px 28px;
+        border-radius: var(--radius);
+        color: var(--paper);
+        background: var(--ink);
+      }
+
+      .example-strip > div:first-child {
+        padding-right: 20px;
+        border-right: 1px solid rgba(255, 255, 255, 0.18);
+      }
+
+      .example-strip small {
+        display: block;
+        margin-bottom: 5px;
+        color: rgba(255, 255, 255, 0.48);
+        font-size: 9px;
+        letter-spacing: 0.1em;
+      }
+
+      .example-strip strong {
+        font-size: 19px;
+      }
+
+      .example-flow {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .example-flow span {
+        flex: 1;
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 11px;
+        line-height: 1.5;
+        text-align: center;
+      }
+
+      .example-flow i {
+        color: rgba(255, 255, 255, 0.35);
+        font-style: normal;
+      }
+
+      .lifecycle-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+      }
+
+      .lifecycle-card {
+        min-height: 360px;
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper);
+      }
+
+      .lifecycle-card:nth-child(1) {
+        border-top: 4px solid var(--red);
+      }
+
+      .lifecycle-card:nth-child(2) {
+        border-top: 4px solid var(--blue);
+      }
+
+      .lifecycle-card:nth-child(3) {
+        border-top: 4px solid var(--green);
+      }
+
+      .lifecycle-card:nth-child(4) {
+        border-top: 4px solid var(--amber);
+      }
+
+      .user-tag {
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 730;
+        letter-spacing: 0.12em;
+      }
+
+      .lifecycle-card h3 {
+        margin: 12px 0 22px;
+        font-size: 23px;
+      }
+
+      .strategy-item {
+        padding: 13px 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .strategy-item small {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--muted-2);
+        font-size: 9px;
+      }
+
+      .strategy-item strong {
+        font-size: 12px;
+        font-weight: 620;
+        line-height: 1.5;
+      }
+
+      .lifecycle-rule {
+        margin-top: 20px;
+        padding: 17px 22px;
+        border-left: 3px solid var(--red);
+        color: var(--ink-2);
+        background: var(--red-soft);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .mind-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+        gap: 36px;
+      }
+
+      .mind-loop {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        align-items: center;
+        min-height: 290px;
+        padding: 28px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        background: var(--paper);
+      }
+
+      .mind-step {
+        position: relative;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .mind-step:not(:last-child)::after {
+        position: absolute;
+        top: 32px;
+        left: 72%;
+        width: 56%;
+        height: 1px;
+        background: var(--line-strong);
+        content: "";
+      }
+
+      .mind-step b {
+        z-index: 2;
+        display: grid;
+        width: 64px;
+        height: 64px;
+        margin-bottom: 17px;
+        place-items: center;
+        border: 1px solid var(--line-strong);
+        border-radius: 50%;
+        color: var(--red);
+        background: var(--paper);
+        font-size: 12px;
+      }
+
+      .mind-step strong {
+        font-size: 13px;
+      }
+
+      .mind-step span {
+        max-width: 105px;
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.45;
+      }
+
+      .mind-metrics {
+        display: grid;
+        gap: 12px;
+      }
+
+      .mind-metric {
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--soft);
+      }
+
+      .mind-metric small {
+        color: var(--muted-2);
+        font-size: 9px;
+        font-weight: 720;
+        letter-spacing: 0.1em;
+      }
+
+      .mind-metric strong {
+        display: block;
+        margin-top: 7px;
+        font-size: 14px;
+      }
+
+      .mind-metric p {
+        margin: 5px 0 0;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.5;
+      }
+
+      .experiment-layout {
+        display: grid;
+        grid-template-columns: 0.85fr 1.15fr;
+        gap: 30px;
+        align-items: stretch;
+      }
+
+      .increment-card {
+        padding: 28px;
+        border-radius: var(--radius-lg);
+        color: var(--paper);
+        background: var(--ink);
+      }
+
+      .increment-card h3 {
+        margin-bottom: 20px;
+      }
+
+      .formula-stack {
+        display: grid;
+        gap: 7px;
+      }
+
+      .formula-term {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 11px 13px;
+        border-radius: var(--radius-sm);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .formula-term span {
+        color: rgba(255, 255, 255, 0.58);
+        font-size: 10px;
+      }
+
+      .formula-term strong {
+        font-size: 12px;
+      }
+
+      .formula-multiply {
+        color: rgba(255, 255, 255, 0.32);
+        font-size: 12px;
+        text-align: center;
+      }
+
+      .experiment-table {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper);
+      }
+
+      .experiment-row {
+        display: grid;
+        grid-template-columns: 128px 1fr;
+        min-height: 58px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .experiment-row:last-child {
+        border-bottom: 0;
+      }
+
+      .experiment-row > strong {
+        display: flex;
+        align-items: center;
+        padding: 13px 16px;
+        border-right: 1px solid var(--line);
+        background: var(--soft);
+        font-size: 11px;
+      }
+
+      .experiment-row > span {
+        display: flex;
+        align-items: center;
+        padding: 13px 16px;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.55;
+      }
+
+      .experiment-callout {
+        margin-top: 18px;
+        padding: 16px 20px;
+        border-radius: var(--radius-sm);
+        color: var(--red-dark);
+        background: var(--red-soft);
+        font-size: 12px;
+        font-weight: 610;
+        line-height: 1.55;
+      }
+
+      .roadmap {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-top: 10px;
+      }
+
+      .roadmap::before {
+        position: absolute;
+        top: 25px;
+        right: 12%;
+        left: 12%;
+        height: 2px;
+        background: var(--line-strong);
+        content: "";
+      }
+
+      .phase {
+        position: relative;
+        z-index: 2;
+      }
+
+      .phase-dot {
+        display: grid;
+        width: 52px;
+        height: 52px;
+        margin: 0 auto 22px;
+        place-items: center;
+        border: 2px solid var(--line-strong);
+        border-radius: 50%;
+        color: var(--muted);
+        background: var(--paper);
+        font-size: 11px;
+        font-weight: 760;
+      }
+
+      .phase:first-child .phase-dot,
+      .phase:last-child .phase-dot {
+        border-color: var(--red);
+        color: var(--red);
+      }
+
+      .phase-card {
+        min-height: 285px;
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper);
+      }
+
+      .phase-card small {
+        color: var(--red);
+        font-size: 9px;
+        font-weight: 740;
+        letter-spacing: 0.1em;
+      }
+
+      .phase-card h3 {
+        margin: 8px 0 18px;
+      }
+
+      .phase-card ul {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .phase-card li {
+        display: flex;
+        gap: 7px;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.5;
+      }
+
+      .phase-card li::before {
+        color: var(--red);
+        content: "—";
+      }
+
+      .phase-gate {
+        margin-top: 18px;
+        padding-top: 14px;
+        border-top: 1px solid var(--line);
+        color: var(--ink-2);
+        font-size: 10px;
+        font-weight: 640;
+        line-height: 1.5;
+      }
+
+      .closing-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 0.85fr) minmax(480px, 1.15fr);
+        gap: clamp(44px, 7vw, 110px);
+        align-items: center;
+      }
+
+      .closing-quote {
+        margin: 30px 0;
+        padding: 24px 0 24px 22px;
+        border-left: 4px solid var(--red);
+        font-size: clamp(20px, 2.3vw, 32px);
+        font-weight: 620;
+        line-height: 1.5;
+      }
+
+      .decision-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .decision-card {
+        display: grid;
+        grid-template-columns: 58px 1fr;
+        gap: 18px;
+        align-items: center;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper);
+      }
+
+      .decision-card b {
+        display: grid;
+        width: 42px;
+        height: 42px;
+        place-items: center;
+        border-radius: 50%;
+        color: var(--paper);
+        background: var(--red);
+        font-size: 11px;
+      }
+
+      .decision-card strong {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 15px;
+      }
+
+      .decision-card span {
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.55;
+      }
+
+      .source-note {
+        margin-top: 20px;
+        color: var(--muted-2);
+        font-size: 10px;
+        line-height: 1.5;
+      }
+
+      @media (max-width: 1100px) {
+        .executive-card {
+          min-height: 290px;
+          padding: 22px;
+        }
+
+        .architecture {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .architecture .arch-arrow {
+          display: none;
+        }
+
+        .lifecycle-card {
+          padding: 19px;
+        }
+
+        .mind-loop {
+          padding: 20px 12px;
+        }
+
+        .mind-step:not(:last-child)::after {
+          display: none;
+        }
+      }
+
+      @media (max-width: 820px) {
+        html {
+          scroll-snap-type: none;
+        }
+
+        .topbar {
+          height: 56px;
+        }
+
+        .utility-button span,
+        .brand span:last-child,
+        .slide-nav {
+          display: none;
+        }
+
+        .slide {
+          min-height: auto;
+          padding-top: 84px;
+          padding-bottom: 70px;
+          overflow: visible;
+        }
+
+        .cover {
+          color: var(--ink);
+          background: var(--canvas) !important;
+        }
+
+        .cover .slide-inner,
+        .positioning-layout,
+        .metric-layout,
+        .matrix-layout,
+        .mind-layout,
+        .experiment-layout,
+        .closing-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .cover-panel {
+          padding: 24px;
+          border-radius: var(--radius);
+          color: var(--paper);
+          background: var(--ink);
+        }
+
+        .section-head {
+          align-items: flex-start;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .executive-grid,
+        .lifecycle-grid,
+        .roadmap {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .executive-card,
+        .lifecycle-card {
+          min-height: auto;
+        }
+
+        .comparison {
+          grid-template-columns: 1fr;
+          gap: 14px;
+        }
+
+        .comparison-arrow {
+          transform: rotate(90deg);
+        }
+
+        .principle {
+          grid-template-columns: 34px 110px 1fr;
+        }
+
+        .architecture {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .example-strip {
+          grid-template-columns: 1fr;
+        }
+
+        .example-strip > div:first-child {
+          padding-right: 0;
+          padding-bottom: 14px;
+          border-right: 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .mind-loop {
+          grid-template-columns: repeat(3, 1fr);
+          gap: 26px 10px;
+        }
+
+        .roadmap::before {
+          display: none;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .top-actions .utility-button:first-of-type {
+          display: none;
+        }
+
+        h1 {
+          font-size: 44px;
+        }
+
+        h2 {
+          font-size: 32px;
+        }
+
+        .executive-grid,
+        .lifecycle-grid,
+        .roadmap {
+          grid-template-columns: 1fr;
+        }
+
+        .decision-strip {
+          grid-template-columns: 1fr;
+          gap: 7px;
+        }
+
+        .issue-list {
+          grid-template-columns: 1fr;
+        }
+
+        .flow-line {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .flow-arrow {
+          text-align: center;
+          transform: rotate(90deg);
+        }
+
+        .positioning-core {
+          min-height: 310px;
+        }
+
+        .principle {
+          grid-template-columns: 32px 1fr;
+        }
+
+        .principle span {
+          grid-column: 2;
+        }
+
+        .mau-equation {
+          grid-template-columns: 1fr;
+        }
+
+        .equation-sign {
+          text-align: center;
+        }
+
+        .matrix {
+          grid-template-rows: repeat(2, minmax(190px, 1fr));
+        }
+
+        .quadrant {
+          padding: 15px;
+        }
+
+        .architecture,
+        .mind-loop {
+          grid-template-columns: 1fr;
+        }
+
+        .example-flow {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .example-flow i {
+          text-align: center;
+          transform: rotate(90deg);
+        }
+
+        .experiment-row {
+          grid-template-columns: 100px 1fr;
+        }
+      }
+
+      @media print {
+        @page {
+          size: A4 landscape;
+          margin: 0;
+        }
+
+        html,
+        body {
+          background: white;
+          scroll-snap-type: none;
+        }
+
+        .topbar,
+        .progress,
+        .slide-nav {
+          display: none !important;
+        }
+
+        .slide {
+          width: 297mm;
+          height: 210mm;
+          min-height: 210mm;
+          max-height: 210mm;
+          padding: 14mm 18mm 10mm;
+          overflow: hidden;
+          break-after: page;
+          break-inside: avoid;
+          page-break-after: always;
+          page-break-inside: avoid;
+        }
+
+        .slide:last-child {
+          break-after: auto;
+          page-break-after: auto;
+        }
+
+        .slide-inner {
+          flex: 0 0 100%;
+          width: 119%;
+          max-width: none;
+          height: 100%;
+          margin-left: -9.5%;
+          transform: scale(0.84);
+          transform-origin: center;
+        }
+
+        .slide-number {
+          right: 14mm;
+          bottom: 7mm;
+        }
+
+        .cover {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        *,
+        *::before,
+        *::after {
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="progress" id="progress" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand">
+        <i class="brand-mark"></i>
+        负一屏增长战略
+        <span>EXECUTIVE BRIEF</span>
+      </div>
+      <div class="top-actions">
+        <span class="page-count" id="pageCount">01 / 12</span>
+        <button class="utility-button" id="printButton" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+            <path d="M6 14h12v7H6z" />
+          </svg>
+          <span>打印 / PDF</span>
+        </button>
+        <button class="utility-button" id="fullscreenButton" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5" />
+          </svg>
+          <span>全屏汇报</span>
+        </button>
+      </div>
+    </header>
+
+    <nav class="slide-nav" id="slideNav" aria-label="汇报页导航"></nav>
+
+    <main>
+      <section class="slide cover" data-title="封面">
+        <div class="slide-inner">
+          <div class="cover-copy">
+            <div class="cover-label"><i></i> 产品战略与增长方法论</div>
+            <h1>
+              负一屏增长战略
+              <span>从资源位走向场景服务中枢</span>
+            </h1>
+            <p class="subtitle">
+              以场景化服务联动提升有效MAU，建立用户对“现在发生什么、下一步做什么”的稳定心智。
+            </p>
+            <div class="cover-statement">
+              有重要变化、想知道下一步，先看负一屏。
+            </div>
+          </div>
+          <aside class="cover-panel">
+            <div class="cover-panel-label">EXECUTIVE TAKEAWAYS</div>
+            <div class="cover-point">
+              <small>核心矛盾</small>
+              <strong>MAU增长不等于用户心智形成</strong>
+            </div>
+            <div class="cover-point">
+              <small>北极星指标</small>
+              <strong>月成功场景用户数</strong>
+            </div>
+            <div class="cover-point">
+              <small>增长主线</small>
+              <strong>日频锚点 + 状态回流 + 月频刚需</strong>
+            </div>
+          </aside>
+        </div>
+        <span class="slide-number">01</span>
+      </section>
+
+      <section class="slide" data-title="管理层摘要">
+        <div class="slide-inner">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Executive summary</div>
+              <h2>三个战略判断</h2>
+            </div>
+            <p class="section-summary">
+              负一屏真正的增长机会，不在于继续增加资源位，而在于建立系统级、可完成任务的独特价值。
+            </p>
+          </div>
+
+          <div class="executive-grid">
+            <article class="executive-card">
+              <span class="card-index">01</span>
+              <h3>重新定义产品角色</h3>
+              <p>
+                从“卡片与内容陈列页”升级为“当前场景的任务中枢”，帮助用户理解状态并直接完成下一步。
+              </p>
+            </article>
+            <article class="executive-card">
+              <span class="card-index">02</span>
+              <h3>用组合场景驱动增长</h3>
+              <p>
+                日频场景负责培养习惯，状态场景负责形成回访，月频刚需负责扩大MAU覆盖，三者缺一不可。
+              </p>
+            </article>
+            <article class="executive-card">
+              <span class="card-index">03</span>
+              <h3>从打开人数转向成功任务</h3>
+              <p>
+                页面曝光、误触和一次性Push不应成为核心成绩；应衡量有效行为、任务完成与4周重复使用。
+              </p>
+            </article>
+          </div>
+
+          <div class="decision-strip">
+            <span>核心决策</span>
+            <strong>
+              负一屏应优先争夺“今天的重要变化与下一步行动”心智，而不是与内容平台争夺无限浏览时长。
+            </strong>
+          </div>
+        </div>
+        <span class="slide-number">02</span>
+      </section>
+
+      <section class="slide" data-title="问题重构">
+        <div class="slide-inner">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Reframe the problem</div>
+              <h2>MAU问题，本质是价值闭环问题</h2>
+            </div>
+            <p class="section-summary">
+              如果用户每次进入都需要自行寻找内容或跳转多个应用，负一屏就难以形成稳定的使用理由。
+            </p>
+          </div>
+
+          <div class="comparison">
+            <article class="comparison-panel">
+              <span class="comparison-label">当前常见模式</span>
+              <h3>资源位分发逻辑</h3>
+              <div class="flow-line">
+                <span class="flow-node">曝光</span><i class="flow-arrow">→</i>
+                <span class="flow-node">点击</span><i class="flow-arrow">→</i>
+                <span class="flow-node">跳出</span>
+              </div>
+              <ul class="issue-list">
+                <li>用户心智模糊</li>
+                <li>场景之间相互割裂</li>
+                <li>价值依赖运营供给</li>
+                <li>打开后缺少回流理由</li>
+              </ul>
+            </article>
+
+            <div class="comparison-arrow">→</div>
+
+            <article class="comparison-panel target">
+              <span class="comparison-label">目标模式</span>
+              <h3>场景任务逻辑</h3>
+              <div class="flow-line">
+                <span class="flow-node">识别</span><i class="flow-arrow">→</i>
+                <span class="flow-node">完成</span><i class="flow-arrow">→</i>
+                <span class="flow-node">回访</span>
+              </div>
+              <ul class="issue-list">
+                <li>只呈现当前最重要事项</li>
+                <li>多个服务一次联动</li>
+                <li>进度持续回到负一屏</li>
+                <li>形成可重复使用习惯</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+        <span class="slide-number">03</span>
+      </section>
+
+      <section class="slide" data-title="战略定位">
+        <div class="slide-inner">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Strategic positioning</div>
+              <h2>一个心智，四项产品原则</h2>
+            </div>
+          </div>
+
+          <div class="positioning-layout">
+            <div>
+              <div class="positioning-core">
+                <div>
+                  <small>唯一核心心智</small>
+                  <strong>现在发生什么，下一步做什么</strong>
+                </div>
+              </div>
+              <div class="not-list" aria-label="产品边界">
+                <span>不是另一页信息流</span>
+                <span>不是服务商城首页</span>
+                <span>不是应用快捷入口集合</span>
+              </div>
+            </div>
+
+            <div class="principle-list">
+              <div class="principle">
+                <b>01</b><strong>优先级明确</strong>
+                <span>首页首先回答“此刻最重要的是什么”，而不是平均分配曝光。</span>
+              </div>
+              <div class="principle">
+                <b>02</b><strong>完成而非跳转</strong>
+                <span>把地图、钱包、日历等服务编排为一次任务，而非多个入口。</span>
+              </div>
+              <div class="principle">
+                <b>03</b><strong>状态持续回流</strong>
+                <span>服务启动后，路线、物流、充电等进展持续在负一屏更新。</span>
+              </div>
+              <div class="principle">
+                <b>04</b><strong>用户可控可解释</strong>
+                <span>说明场景出现原因，允许关闭、调整和纠正，避免主动服务变成打扰。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="slide-number">04</span>
+      </section>
+
+      <section class="slide" data-title="指标体系">
+        <div class="slide-inner">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Metric system</div>
+              <h2>用“成功场景”校准MAU质量</h2>
+            </div>
+            <p class="section-summary">
+              MAU是结果指标；真正能够指导产品决策的，是用户是否完成有价值的场景行为。
+            </p>
+          </div>
+
+          <div class="metric-layout">
+            <div>
+              <article class="north-star">
+                <span class="north-star-label">NORTH STAR METRIC</span>
+                <h3>月成功场景用户数</h3>
+                <p>
+                  当月至少在负一屏完成一次有效场景行为的去重用户数。页面曝光、误触和无效停留不计入。
+                </p>
+                <div class="metric-tags">
+                  <span>关键状态查看</span>
+                  <span>服务启动</span>
+                  <span>任务 / 交易完成</span>
+                  <span>进度持续追踪</span>
+                </div>
+              </article>
+
+              <div class="mau-equation" aria-label="MAU增长公式">
+                <span class="equation-term">当月MAU</span>
+                <i class="equation-sign">=</i>
+                <span class="equation-term">留存用户</span>
+                <i class="equation-sign">+</i>
+                <span class="equation-term">新激活</span>
+                <i class="equation-sign">+</i>
+                <span class="equation-term">沉默召回</span>
+              </div>
+            </div>
+
+            <div class="metric-table">
+              <div class="metric-row">
+                <strong>结果层</strong>
+                <div><b>有效MAU、DAU/MAU</b><span>衡量规模与使用黏性</span></div>
+              </div>
+              <div class="metric-row">
+                <strong>行为层</strong>
+                <div><b>场景完成率、4周重复率</b><span>判断是否形成稳定价值与习惯</span></div>
+              </div>
+              <div class="metric-row">
+                <strong>心智层</strong>
+                <div><b>首选率、无提示认知率</b><span>衡量“遇到任务是否先想到负一屏”</span></div>
+              </div>
+              <div class="metric-row">
+                <strong>护栏层</strong>
+                <div><b>关闭率、误判率、投诉率</b><span>防止以打扰和透支信任换取短期增长</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="slide-number">05</span>
+      </section>
+
+      <section class="slide" data-title="场景组合">
+        <div class="slide-inner">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Scenario portfolio</div>
+              <h2>用场景组合兼顾规模与习惯</h2>
+            </div>
+            <p class="section-summary">
+              不能只押注单一“爆款场景”：日频、状态、月频场景分别解决不同增长问题。
+            </p>
+          </div>
+
+          <div class="matrix-layout">
+            <div class="matrix-wrap">
+              <span class="axis-y">使用频次：低 → 高</span>
+              <div class="matrix">
+                <article class="quadrant">
+                  <strong>探索消费</strong>
+                  <p>丰富供给与商业转化，但不承担核心心智。</p>
+                  <div><span>内容推荐</span><span>服务发现</span><span>优惠</span></div>
+                </article>
+                <article class="quadrant priority">
+                  <strong>日频锚点</strong>
+                  <p>覆盖广、频次高，是习惯和DAU的核心引擎。</p>
+                  <div><span>晨间</span><span>通勤</span><span>日程</span><span>回家</span></div>
+                </article>
+                <article class="quadrant">
+                  <strong>长尾服务</strong>
+                  <p>按需提供，不宜占据首页长期核心资源。</p>
+                  <div><span>低频查询</span><span>垂直工具</span></div>
+                </article>
+                <article class="quadrant">
+                  <strong>状态 / 月频刚需</strong>
+                  <p>以强任务和关键变化扩大MAU、形成回流。</p>
+                  <div><span>快递</span><span>停车</span><span>充电</span><span>账单</span><span>旅行</span></div>
+                </article>
+              </div>
+              <span class="axis-x">任务价值与闭环能力：低 → 高</span>
+            </div>
+
+            <aside class="scoring-card">
+              <h3>场景优先级模型</h3>
+              <div class="score-formula">
+                <div class="score-line"><b>+</b><span>用户覆盖 × 发生频率</span></div>
+                <div class="score-line"><b>+</b><span>需求强度 × 服务闭环</span></div>
+                <div class="score-line"><b>+</b><span>数据确定性 × 系统独特性</span></div>
+                <div class="score-line"><b>−</b><span>隐私成本 × 打扰风险</span></div>
+              </div>
+              <div class="score-rule">
+                首批验证建议同时选择：一个日频锚点、一个状态场景、一个月频刚需；实际选择需结合内部覆盖率和数据可用性。
+              </div>
+            </aside>
+          </div>
+        </div>
+        <span class="slide-number">06</span>
+      </section>
+
+      <section class="slide" data-title="产品机制">
+        <div class="slide-inner">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Product mechanism</div>
+              <h2>构建统一的场景服务闭环</h2>
+            </div>
+            <p class="section-summary">
+              外部入口只负责提示“发生了什么”，完整价值必须在负一屏内完成和持续更新。
+            </p>
+          </div>
+
+          <div class="architecture">
+            <article class="arch-node">
+              <b>01</b><strong>场景信号</strong><span>时间、位置、日程、设备状态</span>
+            </article>
+            <i class="arch-arrow">→</i>
+            <article class="arch-node">
+              <b>02</b><strong>识别变化</strong><span>判断重要性、确定性与时效</span>
+            </article>
+            <i class="arch-arrow">→</i>
+            <article class="arch-node">
+              <b>03</b><strong>轻触达</strong><span>锁屏、通知、手表、车机</span>
+            </article>
+            <i class="arch-arrow">→</i>
+            <article class="arch-node">
+              <b>04</b><strong>服务联动</strong><span>一次动作编排多个服务</span>
+            </article>
+            <i class="arch-arrow">→</i>
+            <article class="arch-node">
+              <b>05</b><strong>状态回流</strong><span>实时进展持续汇总更新</span>
+            </article>
+            <i class="arch-arrow">→</i>
+            <article class="arch-node">
+              <b>06</b><strong>下一步</strong><span>在合适时机推荐后续行动</span>
+            </article>
+          </div>
+
+          <div class="example-strip">
+            <div>
+              <small>EXAMPLE</small>
+              <strong>通勤场景</strong>
+            </div>
+            <div class="example-flow">
+              <span>路线延误<br />提醒提前出门</span><i>→</i>
+              <span>天气 + 地图<br />生成最佳路线</span><i>→</i>
+              <span>钱包 + 音乐<br />一键开始通勤</span><i>→</i>
+              <span>换乘与到达<br />实时状态回流</span><i>→</i>
+              <span>到达公司<br />切换首个日程</span>
+            </div>
+          </div>
+        </div>
+        <span class="slide-number">07</span>
+      </section>
+
+      <section class="slide" data-title="分层增长">
+        <div class="slide-inner">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Lifecycle growth</div>
+              <h2>不同用户，不同增长任务</h2>
+            </div>
+            <p class="section-summary">
+              同一套推荐和Push策略无法同时解决激活、留存与召回，需要按生命周期匹配价值。
+            </p>
+          </div>
+
+          <div class="lifecycle-grid">
+            <article class="lifecycle-card">
+              <span class="user-tag">NEW USER</span>
+              <h3>新用户</h3>
+              <div class="strategy-item"><small>目标</small><strong>尽快完成第一次价值</strong></div>
+              <div class="strategy-item"><small>策略</small><strong>选择2—3个关注场景，不做完整功能教学</strong></div>
+              <div class="strategy-item"><small>关键指标</small><strong>首个成功场景完成率</strong></div>
+            </article>
+            <article class="lifecycle-card">
+              <span class="user-tag">LIGHT USER</span>
+              <h3>轻度用户</h3>
+              <div class="strategy-item"><small>目标</small><strong>建立第二次、第三次使用</strong></div>
+              <div class="strategy-item"><small>策略</small><strong>用快递到柜、路线延误等高确定性状态召回</strong></div>
+              <div class="strategy-item"><small>关键指标</small><strong>次周重复使用率</strong></div>
+            </article>
+            <article class="lifecycle-card">
+              <span class="user-tag">ACTIVE USER</span>
+              <h3>活跃用户</h3>
+              <div class="strategy-item"><small>目标</small><strong>从单场景扩展到多场景</strong></div>
+              <div class="strategy-item"><small>策略</small><strong>今日时间轴与手机、手表、车机任务接力</strong></div>
+              <div class="strategy-item"><small>关键指标</small><strong>人均成功场景数</strong></div>
+            </article>
+            <article class="lifecycle-card">
+              <span class="user-tag">LAPSED USER</span>
+              <h3>沉默用户</h3>
+              <div class="strategy-item"><small>目标</small><strong>以强需求完成有效召回</strong></div>
+              <div class="strategy-item"><small>策略</small><strong>只使用账单、行程变化、空间不足等刚需事件</strong></div>
+              <div class="strategy-item"><small>关键指标</small><strong>召回后4周留存</strong></div>
+            </article>
+          </div>
+
+          <div class="lifecycle-rule">
+            原则：不使用“今日精彩”“发现更多”等泛化Push制造虚假回流；优惠只能作为任务完成后的增益。
+          </div>
+        </div>
+        <span class="slide-number">08</span>
+      </section>
+
+      <section class="slide" data-title="心智建设">
+        <div class="slide-inner">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Mindshare building</div>
+              <h2>心智来自稳定承诺与重复兑现</h2>
+            </div>
+            <p class="section-summary">
+              用户不会因为功能数量记住负一屏，只会因为某类问题被持续、稳定地解决而形成条件反射。
+            </p>
+          </div>
+
+          <div class="mind-layout">
+            <div class="mind-loop">
+              <div class="mind-step">
+                <b>01</b><strong>统一承诺</strong><span>一句话定位长期稳定</span>
+              </div>
+              <div class="mind-step">
+                <b>02</b><strong>稳定结构</strong><span>现在—接下来—状态</span>
+              </div>
+              <div class="mind-step">
+                <b>03</b><strong>价值证明</strong><span>每次使用都有明确收益</span>
+              </div>
+              <div class="mind-step">
+                <b>04</b><strong>入口一致</strong><span>锁屏、手表、车机同语义</span>
+              </div>
+              <div class="mind-step">
+                <b>05</b><strong>信任积累</strong><span>可解释、可调整、可关闭</span>
+              </div>
+            </div>
+
+            <div class="mind-metrics">
+              <article class="mind-metric">
+                <small>认知调研</small>
+                <strong>无提示认知率</strong>
+                <p>用户如何回答“负一屏是做什么的”。</p>
+              </article>
+              <article class="mind-metric">
+                <small>任务选择</small>
+                <strong>场景首选率</strong>
+                <p>遇到通勤、快递等任务时，首选负一屏的比例。</p>
+              </article>
+              <article class="mind-metric">
+                <small>行为验证</small>
+                <strong>主动进入与4周复用</strong>
+                <p>主动左滑、重复使用和多场景渗透共同验证心智。</p>
+              </article>
+            </div>
+          </div>
+        </div>
+        <span class="slide-number">09</span>
+      </section>
+
+      <section class="slide" data-title="实验评估">
+        <div class="slide-inner">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Experiment & measurement</div>
+              <h2>证明净增，而不是流量搬运</h2>
+            </div>
+            <p class="section-summary">
+              每个场景必须保留长期对照组，并对跨场景用户去重，才能判断真实MAU增量。
+            </p>
+          </div>
+
+          <div class="experiment-layout">
+            <article class="increment-card">
+              <h3>场景增量有效MAU</h3>
+              <div class="formula-stack">
+                <div class="formula-term"><span>01</span><strong>场景可覆盖用户</strong></div>
+                <div class="formula-multiply">×</div>
+                <div class="formula-term"><span>02</span><strong>识别准确率</strong></div>
+                <div class="formula-multiply">×</div>
+                <div class="formula-term"><span>03</span><strong>触达进入率</strong></div>
+                <div class="formula-multiply">×</div>
+                <div class="formula-term"><span>04</span><strong>有效行为转化率</strong></div>
+                <div class="formula-multiply">×</div>
+                <div class="formula-term"><span>05</span><strong>30天留存 × 去重系数</strong></div>
+              </div>
+            </article>
+
+            <div>
+              <div class="experiment-table">
+                <div class="experiment-row">
+                  <strong>对照组</strong>
+                  <span>现有卡片首页与运营策略，保留自然使用基线。</span>
+                </div>
+                <div class="experiment-row">
+                  <strong>实验组</strong>
+                  <span>场景直达 + 服务联动 + 实时状态回流。</span>
+                </div>
+                <div class="experiment-row">
+                  <strong>主指标</strong>
+                  <span>净新增月成功场景用户、4周重复使用率。</span>
+                </div>
+                <div class="experiment-row">
+                  <strong>过程指标</strong>
+                  <span>识别准确率、进入率、任务完成率、跨服务联动成功率。</span>
+                </div>
+                <div class="experiment-row">
+                  <strong>护栏指标</strong>
+                  <span>通知关闭率、场景删除率、误判率、投诉率与业务流量蚕食。</span>
+                </div>
+              </div>
+              <div class="experiment-callout">
+                点击率提升不等于成功：如果没有带来任务完成和长期复用，只是把原有流量换了入口。
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="slide-number">10</span>
+      </section>
+
+      <section class="slide" data-title="实施路线">
+        <div class="slide-inner">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Execution roadmap</div>
+              <h2>从场景验证走向生态能力</h2>
+            </div>
+            <p class="section-summary">
+              每一阶段都设置明确验证门槛，先证明用户价值，再扩大场景和生态供给。
+            </p>
+          </div>
+
+          <div class="roadmap">
+            <div class="phase">
+              <span class="phase-dot">01</span>
+              <article class="phase-card">
+                <small>FOUNDATION</small>
+                <h3>指标与数据底座</h3>
+                <ul>
+                  <li>统一有效活跃定义</li>
+                  <li>建立场景事件与归因</li>
+                  <li>补齐用户授权与纠错</li>
+                </ul>
+                <div class="phase-gate">验证门槛：数据可解释、可归因、可去重</div>
+              </article>
+            </div>
+            <div class="phase">
+              <span class="phase-dot">02</span>
+              <article class="phase-card">
+                <small>VALIDATION</small>
+                <h3>场景组合验证</h3>
+                <ul>
+                  <li>一个日频锚点</li>
+                  <li>一个状态场景</li>
+                  <li>一个月频刚需</li>
+                </ul>
+                <div class="phase-gate">验证门槛：有效MAU与4周复用净增</div>
+              </article>
+            </div>
+            <div class="phase">
+              <span class="phase-dot">03</span>
+              <article class="phase-card">
+                <small>PLATFORM</small>
+                <h3>统一产品框架</h3>
+                <ul>
+                  <li>现在—接下来—状态</li>
+                  <li>跨服务任务编排</li>
+                  <li>多设备任务接续</li>
+                </ul>
+                <div class="phase-gate">验证门槛：多场景渗透与主动进入提升</div>
+              </article>
+            </div>
+            <div class="phase">
+              <span class="phase-dot">04</span>
+              <article class="phase-card">
+                <small>ECOSYSTEM</small>
+                <h3>生态能力开放</h3>
+                <ul>
+                  <li>统一状态与动作协议</li>
+                  <li>服务质量与时效标准</li>
+                  <li>第三方元服务接入</li>
+                </ul>
+                <div class="phase-gate">验证门槛：供给扩大但体验质量不下降</div>
+              </article>
+            </div>
+          </div>
+        </div>
+        <span class="slide-number">11</span>
+      </section>
+
+      <section class="slide" data-title="决策建议">
+        <div class="slide-inner">
+          <div class="closing-layout">
+            <div>
+              <div class="eyebrow">Decision required</div>
+              <h2>最终要建立的，不是功能认知</h2>
+              <div class="closing-quote">
+                而是“有重要变化、想知道下一步，先看负一屏”的条件反射。
+              </div>
+              <p class="source-note">
+                本汇报为策略框架，未使用华为内部业务基线；场景排序和目标值需结合真实覆盖率、识别准确率及用户研究进一步校准。
+              </p>
+            </div>
+
+            <div class="decision-list">
+              <article class="decision-card">
+                <b>01</b>
+                <div>
+                  <strong>统一战略定位</strong>
+                  <span>明确负一屏优先服务“当前重要状态与下一步行动”，减少资源位导向的目标冲突。</span>
+                </div>
+              </article>
+              <article class="decision-card">
+                <b>02</b>
+                <div>
+                  <strong>确定首批场景组合</strong>
+                  <span>按照覆盖、频率、闭环、数据确定性和隐私成本完成内部评分与选择。</span>
+                </div>
+              </article>
+              <article class="decision-card">
+                <b>03</b>
+                <div>
+                  <strong>建立跨业务共同指标</strong>
+                  <span>以成功场景和长期复用为共同目标，避免各云服务只优化自身点击与流量。</span>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+        <span class="slide-number">12</span>
+      </section>
+    </main>
+
+    <script>
+      (() => {
+        const slides = Array.from(document.querySelectorAll(".slide"));
+        const nav = document.getElementById("slideNav");
+        const progress = document.getElementById("progress");
+        const pageCount = document.getElementById("pageCount");
+        let currentIndex = 0;
+
+        pageCount.textContent = `01 / ${String(slides.length).padStart(2, "0")}`;
+
+        const goTo = (index) => {
+          const safeIndex = Math.max(0, Math.min(index, slides.length - 1));
+          slides[safeIndex].scrollIntoView({ behavior: "smooth", block: "start" });
+        };
+
+        const updateNavigation = (index) => {
+          currentIndex = index;
+          const dots = nav.querySelectorAll(".nav-dot");
+          dots.forEach((dot, dotIndex) => {
+            dot.classList.toggle("is-active", dotIndex === index);
+            dot.setAttribute("aria-current", dotIndex === index ? "page" : "false");
+          });
+          progress.style.width = `${((index + 1) / slides.length) * 100}%`;
+          pageCount.textContent = `${String(index + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}`;
+          document.title = `${slides[index].dataset.title}｜负一屏增长战略`;
+        };
+
+        slides.forEach((slide, index) => {
+          const button = document.createElement("button");
+          button.className = "nav-dot";
+          button.type = "button";
+          button.title = `${String(index + 1).padStart(2, "0")} · ${slide.dataset.title}`;
+          button.setAttribute("aria-label", `跳转到第${index + 1}页：${slide.dataset.title}`);
+          button.addEventListener("click", () => goTo(index));
+          nav.appendChild(button);
+        });
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            const visible = entries
+              .filter((entry) => entry.isIntersecting)
+              .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+            if (visible) {
+              updateNavigation(slides.indexOf(visible.target));
+            }
+          },
+          { threshold: [0.45, 0.6, 0.75] },
+        );
+
+        slides.forEach((slide) => observer.observe(slide));
+        updateNavigation(0);
+
+        window.addEventListener("keydown", (event) => {
+          const nextKeys = ["ArrowDown", "ArrowRight", "PageDown"];
+          const previousKeys = ["ArrowUp", "ArrowLeft", "PageUp"];
+
+          if (nextKeys.includes(event.key) || (event.key === " " && !event.shiftKey)) {
+            event.preventDefault();
+            goTo(currentIndex + 1);
+          }
+
+          if (previousKeys.includes(event.key) || (event.key === " " && event.shiftKey)) {
+            event.preventDefault();
+            goTo(currentIndex - 1);
+          }
+
+          if (event.key === "Home") {
+            event.preventDefault();
+            goTo(0);
+          }
+
+          if (event.key === "End") {
+            event.preventDefault();
+            goTo(slides.length - 1);
+          }
+        });
+
+        document.getElementById("printButton").addEventListener("click", () => {
+          window.print();
+        });
+
+        document.getElementById("fullscreenButton").addEventListener("click", async () => {
+          try {
+            if (!document.fullscreenElement) {
+              await document.documentElement.requestFullscreen();
+            } else {
+              await document.exitFullscreen();
+            }
+          } catch {
+            /* Fullscreen can be blocked by the embedding host. */
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
